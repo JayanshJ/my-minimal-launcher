@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Clock — dominates the top of the screen -->
+    <dimen name="clock_text_size">72sp</dimen>
+    <dimen name="clock_margin_top">56dp</dimen>
+
+    <!-- Date line below clock -->
+    <dimen name="date_text_size">15sp</dimen>
+
+    <!-- Widget / calendar event list -->
+    <dimen name="widget_text_size">13sp</dimen>
+
+    <!-- Search field -->
+    <dimen name="search_text_size">18sp</dimen>
+
+    <!-- "Search the web for …" ghost row -->
+    <dimen name="web_search_text_size">13sp</dimen>
+
+    <!-- App list row -->
+    <dimen name="app_item_text_size">17sp</dimen>
+
+    <!-- Shared horizontal margin -->
+    <dimen name="margin_h">28dp</dimen>
+</resources>

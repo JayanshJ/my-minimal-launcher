@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Home screen. Sections (top → bottom):
+      1. Clock (tappable: toggle 12h/24h; long-press: Settings)
+      2. Date
+      3. Weather + calendar widget
+      4. Media controls (gone when inactive)
+      5. Thin divider
+      6. FrameLayout: chosen home-screen apps + empty-state hint
+      7. ↑ drawer hint at the bottom (tappable or swipe-up gesture)
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical">
+
+    <!-- ───────────────── Clock ───────────────── -->
+    <TextView
+        android:id="@+id/tv_clock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_h"
+        android:layout_marginTop="@dimen/clock_margin_top"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="sans-serif-light"
+        android:includeFontPadding="false"
+        android:letterSpacing="-0.03"
+        android:text="00:00"
+        android:textColor="@color/white"
+        android:textSize="@dimen/clock_text_size" />
+
+    <!-- ───────────────── Date ───────────────── -->
+    <TextView
+        android:id="@+id/tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_h"
+        android:layout_marginTop="4dp"
+        android:fontFamily="sans-serif-light"
+        android:letterSpacing="0.05"
+        android:text="Monday, 1 January"
+        android:textColor="@color/gray_secondary"
+        android:textSize="@dimen/date_text_size" />
+
+    <!-- ───────────────── Weather + Calendar widget ───────────────── -->
+    <TextView
+        android:id="@+id/tv_widget"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_h"
+        android:layout_marginEnd="@dimen/margin_h"
+        android:layout_marginTop="18dp"
+        android:fontFamily="sans-serif-light"
+        android:lineSpacingExtra="6dp"
+        android:textColor="@color/gray_secondary"
+        android:textSize="@dimen/widget_text_size" />
+
+    <!-- ───────────────── Pomodoro timer ───────────────── -->
+    <!--
+        Tap  = start / pause
+        Long-press = reset to 25:00 focus
+    -->
+    <TextView
+        android:id="@+id/tv_timer_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_h"
+        android:layout_marginTop="18dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="sans-serif-light"
+        android:includeFontPadding="false"
+        android:letterSpacing="-0.02"
+        android:text="25:00"
+        android:textColor="@color/gray_secondary"
+        android:textSize="28sp" />
+
+    <TextView
+        android:id="@+id/tv_timer_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_h"
+        android:layout_marginTop="3dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="sans-serif-light"
+        android:text="focus  ·  tap to start"
+        android:textColor="#555555"
+        android:textSize="12sp" />
+
+    <!-- ───────────────── Media controls ───────────────── -->
+    <LinearLayout
+        android:id="@+id/panel_media"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_h"
+        android:layout_marginEnd="@dimen/margin_h"
+        android:layout_marginTop="14dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tv_media_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-light"
+            android:maxLines="1"
+            android:textColor="@color/gray_secondary"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/btn_media_prev"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="sans-serif-light"
+                android:paddingEnd="16dp"
+                android:text="prev"
+                android:textColor="@color/white"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/btn_media_play_pause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="sans-serif-light"
+                android:paddingEnd="16dp"
+                android:text="play"
+                android:textColor="@color/white"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/btn_media_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="sans-serif-light"
+                android:text="next"
+                android:textColor="@color/white"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- ───────────────── Divider ───────────────── -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="@dimen/margin_h"
+        android:layout_marginEnd="@dimen/margin_h"
+        android:layout_marginTop="22dp"
+        android:background="@color/divider" />
+
+    <!-- ───────────────── Home apps ───────────────── -->
+    <!--
+        Fills all remaining vertical space.
+        Shows only user-chosen (pinned) apps.
+        tv_empty_hint visible when no apps have been added.
+    -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_home_apps"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingTop="8dp"
+            android:paddingBottom="32dp"
+            android:scrollbars="none" />
+
+        <TextView
+            android:id="@+id/tv_empty_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center"
+            android:lineSpacingExtra="6dp"
+            android:text="swipe up to open the app drawer&#10;long-press any app to add it here"
+            android:textColor="#2E2E2E"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+    <!-- ───────────────── Drawer hint ───────────────── -->
+    <TextView
+        android:id="@+id/tv_drawer_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:text="↑"
+        android:textColor="#2A2A2A"
+        android:textSize="20sp" />
+
+</LinearLayout>

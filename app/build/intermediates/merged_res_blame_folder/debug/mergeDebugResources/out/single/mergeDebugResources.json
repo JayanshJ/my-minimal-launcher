@@ -1,0 +1,54 @@
+[
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-debug-28:\\layout_activity_main.xml.flat",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-debug-28:\\drawable_app_item_bg.xml.flat",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\drawable\\app_item_bg.xml"
+    },
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-debug-28:\\anim_fade_in.xml.flat",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\anim\\fade_in.xml"
+    },
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-debug-28:\\layout_activity_app_drawer.xml.flat",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\layout\\activity_app_drawer.xml"
+    },
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-debug-28:\\anim_fade_out.xml.flat",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\anim\\fade_out.xml"
+    },
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-debug-28:\\layout_item_section_header.xml.flat",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\layout\\item_section_header.xml"
+    },
+    {
+        "merged": "com.minimal.launcher.app-debug-28:/layout_activity_settings.xml.flat",
+        "source": "com.minimal.launcher.app-main-30:/layout/activity_settings.xml"
+    },
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-debug-28:\\layout_item_app.xml.flat",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\layout\\item_app.xml"
+    },
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-debug-28:\\layout_item_app_grid.xml.flat",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\layout\\item_app_grid.xml"
+    },
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-debug-28:\\layout_activity_settings.xml.flat",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\layout\\activity_settings.xml"
+    },
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-debug-28:\\anim_slide_up_in.xml.flat",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\anim\\slide_up_in.xml"
+    },
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-debug-28:\\anim_slide_down_out.xml.flat",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\anim\\slide_down_out.xml"
+    },
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-debug-28:\\xml_accessibility_service_config.xml.flat",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\xml\\accessibility_service_config.xml"
+    }
+]
