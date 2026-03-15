@@ -1,0 +1,30 @@
+[
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-mergeDebugResources-27:\\layout\\item_app_grid.xml",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\layout\\item_app_grid.xml"
+    },
+    {
+        "merged": "com.minimal.launcher.app-mergeDebugResources-27:/layout/activity_settings.xml",
+        "source": "com.minimal.launcher.app-main-30:/layout/activity_settings.xml"
+    },
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-mergeDebugResources-27:\\layout\\item_section_header.xml",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\layout\\item_section_header.xml"
+    },
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-mergeDebugResources-27:\\layout\\activity_settings.xml",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\layout\\activity_settings.xml"
+    },
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-mergeDebugResources-27:\\layout\\activity_main.xml",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-mergeDebugResources-27:\\layout\\item_app.xml",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\layout\\item_app.xml"
+    },
+    {
+        "merged": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-mergeDebugResources-27:\\layout\\activity_app_drawer.xml",
+        "source": "C:\\Users\\jayan\\.gradle\\daemon\\8.13\\com.minimal.launcher.app-main-30:\\layout\\activity_app_drawer.xml"
+    }
+]

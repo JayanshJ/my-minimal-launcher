@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "com.minimal.launcher.app-merged_res-28:/drawable_app_item_bg.xml.flat",
+        "source": "com.minimal.launcher.app-main-30:/drawable/app_item_bg.xml"
+    },
+    {
+        "merged": "com.minimal.launcher.app-merged_res-28:/layout_activity_main.xml.flat",
+        "source": "com.minimal.launcher.app-main-30:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.minimal.launcher.app-merged_res-28:/layout_item_app.xml.flat",
+        "source": "com.minimal.launcher.app-main-30:/layout/item_app.xml"
+    },
+    {
+        "merged": "com.minimal.launcher.app-merged_res-28:/anim_fade_in.xml.flat",
+        "source": "com.minimal.launcher.app-main-30:/anim/fade_in.xml"
+    },
+    {
+        "merged": "com.minimal.launcher.app-merged_res-28:/anim_fade_out.xml.flat",
+        "source": "com.minimal.launcher.app-main-30:/anim/fade_out.xml"
+    }
+]

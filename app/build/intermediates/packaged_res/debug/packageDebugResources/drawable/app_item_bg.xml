@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Minimal state-list background for each app row.
+    Pressed state shows a very subtle dark highlight — no ripple colour.
+    Default state is true black.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <color android:color="@color/press_highlight" />
+    </item>
+    <item android:state_focused="true">
+        <color android:color="@color/press_highlight" />
+    </item>
+    <item>
+        <color android:color="@color/black" />
+    </item>
+</selector>

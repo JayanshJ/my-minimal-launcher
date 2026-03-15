@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Single row in the app list.
+    Pure text, no icon, no card, no elevation.
+    State list drawable provides a subtle press highlight.
+-->
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tv_app_label"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/app_item_bg"
+    android:clickable="true"
+    android:focusable="true"
+    android:fontFamily="sans-serif-light"
+    android:paddingStart="@dimen/margin_h"
+    android:paddingEnd="@dimen/margin_h"
+    android:paddingTop="14dp"
+    android:paddingBottom="14dp"
+    android:textColor="@color/white"
+    android:textSize="@dimen/app_item_text_size" />

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Root layout: true black background, everything is text.
+    Hierarchy (top → bottom):
+      1. Clock (HH:mm, large)
+      2. Date  (Day, D Month, lighter weight)
+      3. Widget panel (calendar events, secondary gray text)
+      4. Thin horizontal rule
+      5. Search bar (underline-only style, no borders/pill)
+      6. "Search the web for …" ghost row (visible while typing)
+      7. App list (RecyclerView, fills remaining space)
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- ───────────────── Clock ───────────────── -->
+    <TextView
+        android:id="@+id/tv_clock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-light"
+        android:includeFontPadding="false"
+        android:letterSpacing="-0.03"
+        android:text="00:00"
+        android:textColor="@color/white"
+        android:textSize="@dimen/clock_text_size"
+        android:layout_marginStart="@dimen/margin_h"
+        android:layout_marginTop="@dimen/clock_margin_top"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- ───────────────── Date ───────────────── -->
+    <TextView
+        android:id="@+id/tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-light"
+        android:letterSpacing="0.05"
+        android:text="Monday, 1 January"
+        android:textAllCaps="false"
+        android:textColor="@color/gray_secondary"
+        android:textSize="@dimen/date_text_size"
+        android:layout_marginStart="@dimen/margin_h"
+        android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_clock" />
+
+    <!-- ───────────────── Widget / calendar panel ───────────────── -->
+    <!--
+        Shows up to 3 upcoming calendar events for today.
+        Hidden when there are no events or no permission.
+    -->
+    <TextView
+        android:id="@+id/tv_widget"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-light"
+        android:lineSpacingExtra="6dp"
+        android:textColor="@color/gray_secondary"
+        android:textSize="@dimen/widget_text_size"
+        android:layout_marginStart="@dimen/margin_h"
+        android:layout_marginEnd="@dimen/margin_h"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_date" />
+
+    <!-- ───────────────── Divider ───────────────── -->
+    <View
+        android:id="@+id/divider_top"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/divider"
+        android:layout_marginStart="@dimen/margin_h"
+        android:layout_marginEnd="@dimen/margin_h"
+        android:layout_marginTop="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_widget" />
+
+    <!-- ───────────────── Search bar ───────────────── -->
+    <!--
+        Bare EditText with no background — the visual affordance is
+        only the thin underline view below it.
+    -->
+    <EditText
+        android:id="@+id/et_search"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:fontFamily="sans-serif-light"
+        android:hint="@string/search_hint"
+        android:textColorHint="@color/gray_hint"
+        android:imeOptions="actionSearch|flagNoExtractUi"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:textColor="@color/white"
+        android:textCursorDrawable="@null"
+        android:textSize="@dimen/search_text_size"
+        android:layout_marginStart="@dimen/margin_h"
+        android:layout_marginEnd="@dimen/margin_h"
+        android:layout_marginTop="16dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider_top" />
+
+    <!-- Underline for search field -->
+    <View
+        android:id="@+id/search_underline"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/white"
+        android:layout_marginStart="@dimen/margin_h"
+        android:layout_marginEnd="@dimen/margin_h"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/et_search" />
+
+    <!-- ───────────────── Web-search ghost row ───────────────── -->
+    <TextView
+        android:id="@+id/tv_web_search"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-light"
+        android:textColor="@color/gray_secondary"
+        android:textSize="@dimen/web_search_text_size"
+        android:paddingTop="14dp"
+        android:paddingBottom="4dp"
+        android:visibility="gone"
+        android:layout_marginStart="@dimen/margin_h"
+        android:layout_marginEnd="@dimen/margin_h"
+        android:layout_marginTop="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/search_underline" />
+
+    <!-- ───────────────── App list ───────────────── -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_apps"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingTop="8dp"
+        android:paddingBottom="32dp"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_web_search" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

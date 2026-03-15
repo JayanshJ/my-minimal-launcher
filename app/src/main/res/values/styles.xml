@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Reusable widget styles for the settings screen.
+    Kept in a separate file to avoid bloating themes.xml.
+-->
+<resources>
+
+    <!-- Section label: e.g. "display", "gestures" -->
+    <style name="SectionHeader">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0.15</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/gray_secondary</item>
+        <item name="android:textSize">10sp</item>
+    </style>
+
+    <!-- Small gray label above each setting row -->
+    <style name="SettingLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/gray_secondary</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <!-- Tappable option word — colour set dynamically (white = active, #555 = inactive) -->
+    <style name="SettingOption">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/gray_hint</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <!-- The "  ·  " separator between options -->
+    <style name="SettingDot">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/gray_hint</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <!-- Thin horizontal rule between settings -->
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginTop">18dp</item>
+        <item name="android:background">@color/divider</item>
+    </style>
+
+</resources>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- True black — used as window background throughout -->
+    <color name="black">#000000</color>
+
+    <!-- Primary text -->
+    <color name="white">#FFFFFF</color>
+
+    <!-- Secondary / subtle labels (date, widget text) -->
+    <color name="gray_secondary">#888888</color>
+
+    <!-- Search placeholder hint text -->
+    <color name="gray_hint">#555555</color>
+
+    <!-- Section dividers -->
+    <color name="divider">#1A1A1A</color>
+
+    <!-- App item pressed state (very subtle — just a slight gray) -->
+    <color name="press_highlight">#111111</color>
+</resources>
