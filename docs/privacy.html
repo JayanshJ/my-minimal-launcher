@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Minimal Launcher</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #fff;
+      color: #111;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+      line-height: 1.7;
+      font-size: 16px;
+    }
+    h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+    .subtitle { color: #666; font-size: 14px; margin-bottom: 40px; }
+    h2 { font-size: 17px; font-weight: 600; margin-top: 36px; margin-bottom: 10px; }
+    p  { color: #333; margin-bottom: 12px; }
+    ul { color: #333; margin: 8px 0 12px 20px; }
+    li { margin-bottom: 6px; }
+    a  { color: #000; }
+    hr { border: none; border-top: 1px solid #eee; margin: 40px 0; }
+  </style>
+</head>
+<body>
+
+  <h1>Privacy Policy</h1>
+  <p class="subtitle">Minimal Launcher &nbsp;·&nbsp; Last updated: March 2026</p>
+
+  <p>
+    Minimal Launcher is a home-screen replacement app built for focus and simplicity.
+    This policy explains what data the app accesses, how it is used, and — importantly —
+    what it never does.
+  </p>
+
+  <h2>Data we access and why</h2>
+
+  <p>The app requests the following permissions:</p>
+
+  <ul>
+    <li>
+      <strong>Approximate location</strong> —
+      Used solely on-device to fetch your local weather (temperature, conditions) and to
+      calculate today's sunrise and sunset times. Your coordinates are never stored on
+      any server and are never shared with third parties. The only external call is a
+      standard HTTPS request to the open-source
+      <a href="https://open-meteo.com" target="_blank">Open-Meteo</a> weather API,
+      which receives your latitude and longitude to return weather data. Open-Meteo
+      does not log or retain individual requests.
+    </li>
+    <li>
+      <strong>Calendar</strong> —
+      Read-only access to display upcoming events (next 24 hours) on your home screen.
+      Calendar data never leaves your device.
+    </li>
+    <li>
+      <strong>Usage statistics (screen time)</strong> —
+      Used to calculate and display your daily screen time on the home screen.
+      This data is processed entirely on-device and is never transmitted anywhere.
+    </li>
+    <li>
+      <strong>App list</strong> —
+      Required for a launcher to display and launch your installed apps.
+      The list of installed apps never leaves your device.
+    </li>
+  </ul>
+
+  <h2>Data we do NOT collect</h2>
+
+  <ul>
+    <li>We do not collect any personal information.</li>
+    <li>We do not run analytics or tracking of any kind.</li>
+    <li>We do not use advertising SDKs.</li>
+    <li>We do not store any data on external servers (beyond the anonymous weather API call).</li>
+    <li>We do not sell, share, or transfer any data to third parties.</li>
+  </ul>
+
+  <h2>Data storage</h2>
+  <p>
+    All preferences (pinned apps, settings, blocked apps, name, etc.) are stored
+    locally on your device using Android's SharedPreferences. This data stays on
+    your device and is deleted when you uninstall the app.
+  </p>
+
+  <h2>Children</h2>
+  <p>
+    Minimal Launcher is not directed at children under 13 and does not knowingly
+    collect any information from children.
+  </p>
+
+  <h2>Changes to this policy</h2>
+  <p>
+    If we update this policy, the new version will be published at this URL.
+    Continued use of the app after changes constitutes acceptance of the revised policy.
+  </p>
+
+  <hr />
+
+  <h2>Contact</h2>
+  <p>
+    Questions? Open an issue on
+    <a href="https://github.com/jayansh/my-minimal-launcher" target="_blank">GitHub</a>
+    or email us at the address listed on the Play Store listing.
+  </p>
+
+</body>
+</html>
