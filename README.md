@@ -9,11 +9,12 @@ A native Android launcher built in Kotlin. Pure black background, white/gray tex
 ### Home screen
 - **Clock** — large, tap to toggle 12h/24h, long-press to open Settings
 - **Date** — day, date, month below the clock
-- **Widget row** — weather · battery % on one line, screen time on the next, then today's calendar events
-- **Pomodoro timer** — 25 min focus / 5 min break / 15 min long break; tap to start/pause, long-press to reset; vibrates on session end
+- **Widget row** — weather · battery % on one line, screen time on the next, then today's calendar events; sunrise/sunset can be shown or hidden
+- **Pomodoro timer** — 25 min focus / 5 min break / 15 min long break; tap to start/pause, long-press to reset; vibrates on session end (hidden by default, enable in Settings)
 - **Media controls** — shows when audio is playing (requires Notification Access); prev · play/pause · next
 - **Pinned apps** — long-press any app in the drawer to add it to the home screen; long-press on the home screen to remove or view app info
 - **Empty-state hint** — shown when no apps are pinned
+- **Alignment** — all home screen elements follow a single left / center / right setting
 
 ### App drawer
 - Swipe up or tap **↑** to open; swipe down or back to close
@@ -23,7 +24,7 @@ A native Android launcher built in Kotlin. Pure black background, white/gray tex
 - Real-time search — filters as you type; falls back to a web search button
 - Keyboard auto-shows on open (toggleable in Settings)
 - Grid / list view toggle (set in Settings)
-- Long-press any app for: pin to home, app info, hide from list
+- Long-press any app for: pin/unpin from home, uninstall, hide from list, app info
 
 ### Gestures (home screen)
 | Gesture | Action |
@@ -36,14 +37,13 @@ A native Android launcher built in Kotlin. Pure black background, white/gray tex
 ### Settings (long-press clock to open)
 | Section | Options |
 |---|---|
-| Clock format | 24h · 12h |
-| App list | list · grid |
-| Font size | small · medium · large |
-| Pomodoro timer | show · hide |
-| Drawer keyboard | on · off |
-| Temperature | °C · °F |
-| Gestures | swipe left app · swipe right app |
-| Hidden apps | hide / unhide apps from the drawer |
+| Appearance | Clock format · Font · Font size · Alignment · Fullscreen |
+| Apps | App list style (list · grid) · Drawer keyboard |
+| Info | Temperature unit · Sunrise/sunset (show · hide) |
+| Timer | Show · hide |
+| Gestures | Swipe left app · swipe right app |
+| Focus | Pomodoro session controls |
+| Hidden apps | Hide / unhide apps from the drawer |
 
 ---
 
@@ -89,10 +89,10 @@ A native Android launcher built in Kotlin. Pure black background, white/gray tex
 
 | File | Purpose |
 |---|---|
-| `MainActivity.kt` | Home screen — clock, widget row, pinned apps, gestures, media, Pomodoro |
-| `AppDrawerActivity.kt` | Full app list — search, alphabet index, grid/list, section headers |
+| `MainActivity.kt` | Home screen — clock, widget row, pinned apps, gestures, media, Pomodoro, alignment |
+| `AppDrawerActivity.kt` | Full app list — search, alphabet index, grid/list, section headers, long-press actions |
 | `SettingsActivity.kt` | All settings options |
-| `AppListAdapter.kt` | Multi-type RecyclerView adapter (Header / App), DiffUtil, grid span |
+| `AppListAdapter.kt` | Multi-type RecyclerView adapter (Header / App), DiffUtil, grid span, text gravity |
 | `PrefsManager.kt` | Single source of truth for all persisted state |
 | `WeatherManager.kt` | Open-Meteo fetch (no API key needed) |
 | `MediaNotificationListener.kt` | NotificationListenerService — enables `MediaSessionManager.getActiveSessions()` |
@@ -102,9 +102,12 @@ A native Android launcher built in Kotlin. Pure black background, white/gray tex
 
 ### Architecture notes
 - Root layout is `LinearLayout` (not ConstraintLayout) so `GONE` collapses space correctly
+- Clock is `match_parent` width so text gravity handles left/center/right alignment correctly
 - Weather + battery + screen time + calendar all live in one `tv_widget` TextView, assembled in `updateWidgetText()`
+- `applyAlignment()` sets width and gravity on all home screen TextViews; passes `textGravity` to the pinned-apps adapter
 - Gestures use `dispatchTouchEvent` (not `onTouchEvent`) so they fire even when child views consume touches
 - Media panel polls every 2 s in `onResume`, paused in `onPause`
 - Clock ticks every second aligned to the next second boundary
 - Weather refreshes on resume + every 15 min via Handler
 - Grid mode uses `GridLayoutManager(2)` with `SpanSizeLookup` — headers span 2, apps span 1
+- Haptics use `KEYBOARD_TAP` for taps and `VIRTUAL_KEY` for long presses (subtle feedback)
