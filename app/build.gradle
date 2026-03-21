@@ -3,22 +3,49 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+// ── Load local.properties (keystore credentials etc.) ─────────────────────────
+def localProps = new Properties()
+def localPropsFile = rootProject.file('local.properties')
+if (localPropsFile.exists()) {
+    localPropsFile.withInputStream { localProps.load(it) }
+}
+
 android {
     namespace 'com.minimal.launcher'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.minimal.launcher"
         minSdk 29
-        targetSdk 34
-        versionCode 1
-        versionName "1.0"
+        targetSdk 35
+        versionCode 2
+        versionName "1.1"
+    }
+
+    // ── Signing ───────────────────────────────────────────────────────────────
+    // To sign release builds, create a keystore and fill in the values below,
+    // or (recommended) pull them from local.properties / environment variables:
+
+    signingConfigs {
+        release {
+            storeFile     file(localProps.getProperty("KEYSTORE_PATH") ?: findProperty("KEYSTORE_PATH") ?: "keystore.jks")
+            storePassword (localProps.getProperty("KEYSTORE_PASS")     ?: findProperty("KEYSTORE_PASS") ?: "")
+            keyAlias      (localProps.getProperty("KEY_ALIAS")         ?: findProperty("KEY_ALIAS")     ?: "")
+            keyPassword   (localProps.getProperty("KEY_PASS")          ?: findProperty("KEY_PASS")      ?: "")
+        }
     }
 
     buildTypes {
-        release {
+        debug {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            shrinkResources false
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                          'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 
@@ -27,21 +54,46 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds true
+        disable 'MissingTranslation', 'ExtraTranslation'
+    }
+
+    packaging {
+        resources {
+            excludes += ['META-INF/LICENSE.txt', 'META-INF/NOTICE.txt',
+                         'META-INF/*.kotlin_module']
+        }
+    }
+
+    // Remove unused resources in all builds (locale stripping saves ~1 MB)
+    bundle {
+        language {
+            enableSplit = true
+        }
+        density {
+            enableSplit = true
+        }
+        abi {
+            enableSplit = true
+        }
     }
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
-    // Coroutines — used for async weather fetch (no third-party HTTP lib needed)
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
 }

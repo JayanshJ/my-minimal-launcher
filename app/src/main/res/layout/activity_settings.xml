@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Settings screen — pure text, same black/white aesthetic.
-    Active options are white; inactive options are #555555.
-    Sections are separated by very subtle 1dp dividers.
--->
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -18,18 +13,19 @@
         android:orientation="vertical"
         android:paddingStart="@dimen/margin_h"
         android:paddingEnd="@dimen/margin_h"
-        android:paddingTop="56dp"
+        android:paddingTop="52dp"
         android:paddingBottom="48dp">
 
-        <!-- ── Page title ── -->
+        <!-- ── Title ── -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-light"
-            android:letterSpacing="-0.02"
+            android:fontFamily="sans-serif-thin"
+            android:includeFontPadding="false"
+            android:letterSpacing="-0.03"
             android:text="settings"
             android:textColor="@color/white"
-            android:textSize="36sp" />
+            android:textSize="40sp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -37,137 +33,308 @@
             android:layout_marginTop="4dp"
             android:fontFamily="sans-serif-light"
             android:text="long-press clock to return"
-            android:textColor="@color/gray_secondary"
+            android:textColor="#555555"
             android:textSize="12sp" />
 
-        <!-- ══════════ DISPLAY ══════════ -->
-        <TextView
-            style="@style/SectionHeader"
-            android:layout_marginTop="36dp"
-            android:text="display" />
+        <!-- ══ APPEARANCE ══ -->
+        <TextView style="@style/SectionHeader" android:layout_marginTop="36dp" android:text="appearance" />
 
-        <!-- Clock format -->
-        <TextView style="@style/SettingLabel" android:text="clock format" />
-        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:layout_marginTop="6dp">
-            <TextView android:id="@+id/opt_24h"   style="@style/SettingOption" android:text="24h" />
-            <TextView style="@style/SettingDot" android:text="  ·  " />
-            <TextView android:id="@+id/opt_12h"   style="@style/SettingOption" android:text="12h" />
+        <!-- name -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="name" />
+            <TextView
+                android:id="@+id/opt_name"
+                style="@style/RowValue"
+                android:text="tap to set" />
         </LinearLayout>
 
-        <View style="@style/Divider" />
-
-        <!-- App list display -->
-        <TextView style="@style/SettingLabel" android:text="app list" />
-        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:layout_marginTop="6dp">
-            <TextView android:id="@+id/opt_list" style="@style/SettingOption" android:text="list" />
-            <TextView style="@style/SettingDot"  android:text="  ·  " />
-            <TextView android:id="@+id/opt_grid" style="@style/SettingOption" android:text="grid" />
+        <!-- alignment -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="alignment" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_align_left"   style="@style/Opt" android:text="left" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_align_center" style="@style/Opt" android:text="center" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_align_right"  style="@style/Opt" android:text="right" />
+            </LinearLayout>
         </LinearLayout>
 
-        <View style="@style/Divider" />
-
-        <!-- Font size -->
-        <TextView style="@style/SettingLabel" android:text="font size" />
-        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:layout_marginTop="6dp">
-            <TextView android:id="@+id/opt_font_small"  style="@style/SettingOption" android:text="small" />
-            <TextView style="@style/SettingDot" android:text="  ·  " />
-            <TextView android:id="@+id/opt_font_medium" style="@style/SettingOption" android:text="medium" />
-            <TextView style="@style/SettingDot" android:text="  ·  " />
-            <TextView android:id="@+id/opt_font_large"  style="@style/SettingOption" android:text="large" />
+        <!-- status bar -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="status bar" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_statusbar_show" style="@style/Opt" android:text="show" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_statusbar_hide" style="@style/Opt" android:text="hide" />
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- Timer visibility -->
-        <TextView style="@style/SettingLabel" android:text="pomodoro timer" />
-        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:layout_marginTop="6dp">
-            <TextView android:id="@+id/opt_timer_show" style="@style/SettingOption" android:text="show" />
-            <TextView style="@style/SettingDot" android:text="  ·  " />
-            <TextView android:id="@+id/opt_timer_hide" style="@style/SettingOption" android:text="hide" />
+        <!-- clock format -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="clock format" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_24h" style="@style/Opt" android:text="24h" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_12h" style="@style/Opt" android:text="12h" />
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- Drawer keyboard -->
-        <TextView style="@style/SettingLabel" android:text="drawer keyboard" />
-        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:layout_marginTop="6dp">
-            <TextView android:id="@+id/opt_keyboard_on"  style="@style/SettingOption" android:text="on" />
-            <TextView style="@style/SettingDot" android:text="  ·  " />
-            <TextView android:id="@+id/opt_keyboard_off" style="@style/SettingOption" android:text="off" />
+        <!-- font family -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="font" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_font_sans"  style="@style/Opt" android:text="sans" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_font_serif" style="@style/Opt" android:text="serif" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_font_mono"  style="@style/Opt" android:text="mono" />
+            </LinearLayout>
         </LinearLayout>
 
-        <View style="@style/Divider" />
-
-        <!-- Temperature unit -->
-        <TextView style="@style/SettingLabel" android:text="temperature" />
-        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:layout_marginTop="6dp">
-            <TextView android:id="@+id/opt_celsius"    style="@style/SettingOption" android:text="°C" />
-            <TextView style="@style/SettingDot" android:text="  ·  " />
-            <TextView android:id="@+id/opt_fahrenheit" style="@style/SettingOption" android:text="°F" />
+        <!-- font weight -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="weight" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_ui_thin"    style="@style/Opt" android:text="thin" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_ui_light"   style="@style/Opt" android:text="light" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_ui_regular" style="@style/Opt" android:text="regular" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_ui_medium"  style="@style/Opt" android:text="medium" />
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- ══════════ GESTURES ══════════ -->
-        <TextView
-            style="@style/SectionHeader"
-            android:layout_marginTop="28dp"
-            android:text="gestures" />
+        <!-- clock size -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="clock size" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_clock_small"  style="@style/Opt" android:text="small" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_clock_medium" style="@style/Opt" android:text="medium" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_clock_large"  style="@style/Opt" android:text="large" />
+            </LinearLayout>
+        </LinearLayout>
 
-        <!-- Swipe left -->
-        <TextView style="@style/SettingLabel" android:text="swipe left" />
-        <TextView
-            android:id="@+id/opt_gesture_left"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="sans-serif-light"
-            android:text="none"
-            android:textColor="@color/white"
-            android:textSize="17sp" />
+        <!-- clock weight -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="clock weight" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_weight_thin"    style="@style/Opt" android:text="thin" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_weight_light"   style="@style/Opt" android:text="light" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_weight_regular" style="@style/Opt" android:text="regular" />
+            </LinearLayout>
+        </LinearLayout>
 
-        <View style="@style/Divider" />
+        <!-- top padding -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="top padding" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_padding_compact"  style="@style/Opt" android:text="compact" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_padding_default"  style="@style/Opt" android:text="default" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_padding_relaxed"  style="@style/Opt" android:text="relaxed" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_padding_spacious" style="@style/Opt" android:text="spacious" />
+            </LinearLayout>
+        </LinearLayout>
 
-        <!-- Swipe right -->
-        <TextView style="@style/SettingLabel" android:text="swipe right" />
-        <TextView
-            android:id="@+id/opt_gesture_right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="sans-serif-light"
-            android:text="none"
-            android:textColor="@color/white"
-            android:textSize="17sp" />
+        <!-- ══ APPS ══ -->
+        <TextView style="@style/SectionHeader" android:layout_marginTop="28dp" android:text="apps" />
 
-        <!-- ══════════ HIDDEN APPS ══════════ -->
-        <TextView
-            style="@style/SectionHeader"
-            android:layout_marginTop="28dp"
-            android:text="hidden apps" />
+        <!-- app list style -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="drawer layout" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_list" style="@style/Opt" android:text="list" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_grid" style="@style/Opt" android:text="grid" />
+            </LinearLayout>
+        </LinearLayout>
 
-        <!-- Populated dynamically at runtime -->
-        <LinearLayout
-            android:id="@+id/ll_hidden_apps"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
+        <!-- font size -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="font size" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_font_small"  style="@style/Opt" android:text="small" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_font_medium" style="@style/Opt" android:text="medium" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_font_large"  style="@style/Opt" android:text="large" />
+            </LinearLayout>
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/btn_hide_app"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="sans-serif-light"
-            android:text="hide an app..."
-            android:textColor="@color/gray_secondary"
-            android:textSize="15sp" />
+        <!-- drawer keyboard -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="keyboard" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_keyboard_on"  style="@style/Opt" android:text="on" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_keyboard_off" style="@style/Opt" android:text="off" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ══ INFO ══ -->
+        <TextView style="@style/SectionHeader" android:layout_marginTop="28dp" android:text="info" />
+
+        <!-- temperature -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="temperature" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_celsius"    style="@style/Opt" android:text="°C" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_fahrenheit" style="@style/Opt" android:text="°F" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- sunrise / sunset -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="sunrise/sunset" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_sunrise_show" style="@style/Opt" android:text="show" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_sunrise_hide" style="@style/Opt" android:text="hide" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- world clock -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="world clock" />
+            <TextView
+                android:id="@+id/opt_world_clock"
+                style="@style/RowValue"
+                android:text="none" />
+        </LinearLayout>
+
+        <!-- days until -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="days until" />
+            <TextView
+                android:id="@+id/opt_days_until"
+                style="@style/RowValue"
+                android:text="tap to set" />
+        </LinearLayout>
+
+        <!-- ══ TIMER ══ -->
+        <TextView style="@style/SectionHeader" android:layout_marginTop="28dp" android:text="timer" />
+
+        <!-- pomodoro visibility -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="pomodoro" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_timer_show" style="@style/Opt" android:text="show" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_timer_hide" style="@style/Opt" android:text="hide" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ══ GESTURES ══ -->
+        <TextView style="@style/SectionHeader" android:layout_marginTop="28dp" android:text="gestures" />
+
+        <!-- swipe left -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="swipe left" />
+            <TextView
+                android:id="@+id/opt_gesture_left"
+                style="@style/RowValue"
+                android:text="none" />
+        </LinearLayout>
+
+        <!-- swipe right -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="swipe right" />
+            <TextView
+                android:id="@+id/opt_gesture_right"
+                style="@style/RowValue"
+                android:text="none" />
+        </LinearLayout>
+
+        <!-- ══ FOCUS ══ -->
+        <TextView style="@style/SectionHeader" android:layout_marginTop="28dp" android:text="focus" />
+
+        <!-- wind-down toggle -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="wind-down" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_wind_down_on"  style="@style/Opt" android:text="on" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_wind_down_off" style="@style/Opt" android:text="off" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- wind-down time -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="at" />
+            <TextView
+                android:id="@+id/opt_wind_down_time"
+                style="@style/RowValue"
+                android:text="22:00" />
+        </LinearLayout>
+
+        <!-- blocked apps -->
+        <LinearLayout style="@style/SettingRow" android:layout_marginTop="18dp">
+            <TextView style="@style/RowLabel" android:text="blocked" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/ll_blocked_apps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:id="@+id/btn_block_app"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="sans-serif-light"
+                    android:text="add app..."
+                    android:textColor="@color/gray_secondary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ══ HIDDEN APPS ══ -->
+        <TextView style="@style/SectionHeader" android:layout_marginTop="28dp" android:text="hidden apps" />
+
+        <LinearLayout style="@style/SettingRow" android:layout_marginTop="8dp">
+            <TextView style="@style/RowLabel" android:text="hidden" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/ll_hidden_apps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:id="@+id/btn_hide_app"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="sans-serif-light"
+                    android:text="hide an app..."
+                    android:textColor="@color/gray_secondary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

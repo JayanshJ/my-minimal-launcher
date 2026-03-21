@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+
+  <!-- Black background -->
+  <rect width="512" height="512" fill="#000000"/>
+
+  <!--
+      Home screen silhouette — 4 rounded bars.
+      Scaled from 108dp canvas to 512px  (×4.74).
+
+      Clock bar  : x 95–407, y 152–218   (wide, tall)
+      Date bar   : x 95–308, y 246–284   (medium, short)
+      App row 1  : x 95–261, y 317–355   (narrow, short)
+      App row 2  : x 95–218, y 384–422   (shortest, dimmer)
+  -->
+
+  <!-- Clock bar -->
+  <rect x="95" y="152" width="312" height="66" rx="10" ry="10" fill="#FFFFFF"/>
+
+  <!-- Date bar -->
+  <rect x="95" y="246" width="213" height="38" rx="8" ry="8" fill="#AAAAAA"/>
+
+  <!-- App row 1 -->
+  <rect x="95" y="317" width="166" height="38" rx="8" ry="8" fill="#FFFFFF"/>
+
+  <!-- App row 2 -->
+  <rect x="95" y="384" width="123" height="38" rx="8" ry="8" fill="#666666"/>
+
+</svg>

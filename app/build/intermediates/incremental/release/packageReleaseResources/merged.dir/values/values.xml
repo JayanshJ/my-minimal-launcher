@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#000000</color>
+    <color name="divider">#252525</color>
+    <color name="gray_hint">#777777</color>
+    <color name="gray_secondary">#AAAAAA</color>
+    <color name="press_highlight">#111111</color>
+    <color name="white">#FFFFFF</color>
+    <dimen name="app_item_text_size">17sp</dimen>
+    <dimen name="clock_margin_top">48dp</dimen>
+    <dimen name="clock_text_size">72sp</dimen>
+    <dimen name="date_text_size">15sp</dimen>
+    <dimen name="margin_h">28dp</dimen>
+    <dimen name="search_text_size">18sp</dimen>
+    <dimen name="web_search_text_size">13sp</dimen>
+    <dimen name="widget_text_size">13sp</dimen>
+    <string name="app_description">A clean, distraction-free launcher focused on productivity and simplicity.</string>
+    <string name="app_name">Minimal Launcher</string>
+    <string name="search_hint">search apps</string>
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginTop">18dp</item>
+        <item name="android:background">@color/divider</item>
+    </style>
+    <style name="Dot">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:text">  ·  </item>
+        <item name="android:textColor">@color/gray_hint</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="MinimalWindowAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/fade_in</item>
+        <item name="android:activityOpenExitAnimation">@anim/fade_out</item>
+        <item name="android:activityCloseEnterAnimation">@anim/fade_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/fade_out</item>
+    </style>
+    <style name="Opt">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/gray_hint</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="RowLabel">
+        <item name="android:layout_width">100dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">#666666</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="RowOptions">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+    <style name="RowValue">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="SectionHeader">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0.15</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/gray_secondary</item>
+        <item name="android:textSize">10sp</item>
+    </style>
+    <style name="SettingDot">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/gray_hint</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+    <style name="SettingLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">22dp</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textColor">@color/gray_secondary</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+    <style name="SettingOption">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/gray_hint</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+    <style name="SettingRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">14dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+    <style name="Theme.MinimalLauncher" parent="Theme.AppCompat.DayNight.NoActionBar">
+        
+        <item name="android:windowBackground">@color/black</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowAnimationStyle">@style/MinimalWindowAnimation</item>
+
+        
+        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:navigationBarColor">@color/black</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+
+        
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorHint">@color/gray_hint</item>
+
+        
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorAccent">@color/white</item>
+        <item name="colorControlNormal">@color/white</item>
+        <item name="colorControlActivated">@color/white</item>
+        <item name="colorControlHighlight">@color/press_highlight</item>
+    </style>
+</resources>

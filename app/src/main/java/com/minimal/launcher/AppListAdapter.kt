@@ -1,8 +1,13 @@
 package com.minimal.launcher
 
+import android.graphics.Color
+import android.graphics.Typeface
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.OvershootInterpolator
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -23,15 +28,45 @@ class AppListAdapter(
         const val TYPE_HEADER   = 0
         const val TYPE_APP_LIST = 1
         const val TYPE_APP_GRID = 2
+
+        val COLOR_NORMAL   = Color.WHITE
+        val COLOR_SELECTED = Color.WHITE
+        val COLOR_DIM      = Color.parseColor("#404040")
     }
 
-    // ── Mutable display properties (set by MainActivity) ──────────────────────
+    // ── Display properties ────────────────────────────────────────────────────
 
-    /** sp value applied to every app-row label. */
     var fontSizeSp: Float = 17f
-
-    /** When true, inflate the compact grid cell layout instead of the list layout. */
+    var typeface: Typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
     var gridMode: Boolean = false
+    var textGravity: Int = android.view.Gravity.START
+
+    // ── Selection state ───────────────────────────────────────────────────────
+
+    var selectionMode: Boolean = false
+        private set
+
+    private val _selected = mutableSetOf<String>()
+    val selectedPackages: Set<String> get() = _selected
+
+    fun enterSelectionMode(packageName: String) {
+        selectionMode = true
+        _selected.clear()
+        _selected.add(packageName)
+        notifyDataSetChanged()
+    }
+
+    fun toggleSelection(packageName: String) {
+        if (_selected.contains(packageName)) _selected.remove(packageName)
+        else _selected.add(packageName)
+        notifyDataSetChanged()
+    }
+
+    fun clearSelection() {
+        selectionMode = false
+        _selected.clear()
+        notifyDataSetChanged()
+    }
 
     // ── Data ──────────────────────────────────────────────────────────────────
 
@@ -55,11 +90,6 @@ class AppListAdapter(
         diff.dispatchUpdatesTo(this)
     }
 
-    /**
-     * Returns the span size for a given position.
-     * Used by [GridLayoutManager.SpanSizeLookup]: headers fill both columns;
-     * app cells fill one column.
-     */
     fun getSpanSize(position: Int): Int =
         if (items.getOrNull(position) is Item.Header) 2 else 1
 
@@ -95,10 +125,34 @@ class AppListAdapter(
         when (val item = items[position]) {
             is Item.Header -> (holder as HeaderViewHolder).title.text = item.title
             is Item.App    -> with(holder as AppViewHolder) {
+                val isSelected = _selected.contains(item.info.packageName)
+
                 label.text     = item.info.label
                 label.textSize = fontSizeSp
+                label.typeface = typeface
+                label.gravity  = textGravity
+                label.setTextColor(when {
+                    !selectionMode -> COLOR_NORMAL
+                    isSelected     -> COLOR_SELECTED
+                    else           -> COLOR_DIM
+                })
+                itemView.setBackgroundColor(
+                    if (isSelected) Color.parseColor("#0F0F0F") else Color.TRANSPARENT
+                )
+
                 itemView.setOnClickListener     { onAppClick(item.info) }
                 itemView.setOnLongClickListener { onAppLongClick(item.info) }
+                itemView.setOnTouchListener { v, event ->
+                    when (event.actionMasked) {
+                        MotionEvent.ACTION_DOWN ->
+                            v.animate().scaleX(0.94f).scaleY(0.94f).alpha(0.75f)
+                                .setDuration(70).setInterpolator(DecelerateInterpolator()).start()
+                        MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL ->
+                            v.animate().scaleX(1f).scaleY(1f).alpha(1f)
+                                .setDuration(220).setInterpolator(OvershootInterpolator(1.8f)).start()
+                    }
+                    false
+                }
             }
         }
     }

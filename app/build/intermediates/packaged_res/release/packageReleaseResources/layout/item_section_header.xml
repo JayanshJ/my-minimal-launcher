@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Section label row: "pinned", "frequent", "all apps".
+    All caps, tracked out, secondary gray — purely typographic hierarchy.
+-->
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tv_section_header"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fontFamily="sans-serif"
+    android:letterSpacing="0.15"
+    android:paddingStart="@dimen/margin_h"
+    android:paddingEnd="@dimen/margin_h"
+    android:paddingTop="22dp"
+    android:paddingBottom="6dp"
+    android:textAllCaps="true"
+    android:textColor="@color/gray_secondary"
+    android:textSize="10sp" />

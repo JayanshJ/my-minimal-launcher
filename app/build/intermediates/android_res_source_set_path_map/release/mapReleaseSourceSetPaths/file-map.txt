@@ -1,0 +1,9 @@
+com.minimal.launcher.app-pngs-0 /Users/jayansh/Developer/Personal/my-minimal-launcher/app/build/generated/res/pngs/release
+com.minimal.launcher.app-resValues-1 /Users/jayansh/Developer/Personal/my-minimal-launcher/app/build/generated/res/resValues/release
+com.minimal.launcher.app-updated_navigation_xml-2 /Users/jayansh/Developer/Personal/my-minimal-launcher/app/build/generated/updated_navigation_xml/release
+com.minimal.launcher.app-packageReleaseResources-3 /Users/jayansh/Developer/Personal/my-minimal-launcher/app/build/intermediates/incremental/release/packageReleaseResources/merged.dir
+com.minimal.launcher.app-packageReleaseResources-4 /Users/jayansh/Developer/Personal/my-minimal-launcher/app/build/intermediates/incremental/release/packageReleaseResources/stripped.dir
+com.minimal.launcher.app-merged-not-compiled-resources-5 /Users/jayansh/Developer/Personal/my-minimal-launcher/app/build/intermediates/merged-not-compiled-resources/release
+com.minimal.launcher.app-release-6 /Users/jayansh/Developer/Personal/my-minimal-launcher/app/build/intermediates/merged_res/release/mergeReleaseResources
+com.minimal.launcher.app-main-7 /Users/jayansh/Developer/Personal/my-minimal-launcher/app/src/main/res
+com.minimal.launcher.app-release-8 /Users/jayansh/Developer/Personal/my-minimal-launcher/app/src/release/res

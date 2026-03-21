@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">Minimal Launcher</string>
     <string name="search_hint">search apps</string>
+    <string name="app_description">A clean, distraction-free launcher focused on productivity and simplicity.</string>
 </resources>

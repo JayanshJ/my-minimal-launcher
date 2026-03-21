@@ -27,7 +27,7 @@ class AlphabetIndexView @JvmOverloads constructor(
     private val sp = resources.displayMetrics.scaledDensity
 
     private val idlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#4D4D4D")
+        color = Color.parseColor("#6A6A6A")
         textAlign = Paint.Align.CENTER
         textSize = 9f * sp
         typeface = Typeface.create("sans-serif", Typeface.NORMAL)

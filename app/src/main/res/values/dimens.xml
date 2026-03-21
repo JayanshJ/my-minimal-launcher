@@ -2,7 +2,7 @@
 <resources>
     <!-- Clock — dominates the top of the screen -->
     <dimen name="clock_text_size">72sp</dimen>
-    <dimen name="clock_margin_top">56dp</dimen>
+    <dimen name="clock_margin_top">48dp</dimen>
 
     <!-- Date line below clock -->
     <dimen name="date_text_size">15sp</dimen>

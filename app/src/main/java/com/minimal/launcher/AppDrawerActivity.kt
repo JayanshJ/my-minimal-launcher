@@ -2,6 +2,8 @@ package com.minimal.launcher
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -12,10 +14,14 @@ import android.view.GestureDetector
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.AnimationUtils
+import android.view.animation.LayoutAnimationController
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -35,6 +41,10 @@ class AppDrawerActivity : AppCompatActivity() {
     private var letterPositionMap: Map<Char, Int> = emptyMap()
     private lateinit var swipeDownDetector: GestureDetector
 
+    // Batch uninstall
+    private val uninstallQueue = ArrayDeque<String>()
+    private lateinit var uninstallLauncher: ActivityResultLauncher<Intent>
+
     // ─── Lifecycle ────────────────────────────────────────────────────────────
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,37 +57,57 @@ class AppDrawerActivity : AppCompatActivity() {
 
         prefs = PrefsManager(this)
 
+        // Register before any setup — must be called before onStart
+        uninstallLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { uninstallNext() }
+
         setupSwipeDown()
         setupAppList()
         setupSearch()
         setupAlphabetIndex()
         setupPackageReceiver()
+        setupSelectionBar()
         loadApps()
 
         binding.tvCloseHandle.setOnClickListener { finish() }
 
-        // Handle back: clear search first, then close drawer
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (currentQuery.isNotEmpty()) binding.etSearch.text.clear()
-                else finish()
+                when {
+                    adapter.selectionMode  -> exitSelectionMode()
+                    currentQuery.isNotEmpty() -> binding.etSearch.text.clear()
+                    else                   -> finish()
+                }
             }
         })
     }
 
+    private fun applyFullscreen() {
+        val ctrl = WindowInsetsControllerCompat(window, window.decorView)
+        if (prefs.fullscreenMode) {
+            ctrl.hide(WindowInsetsCompat.Type.statusBars())
+            ctrl.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        } else {
+            ctrl.show(WindowInsetsCompat.Type.statusBars())
+        }
+    }
+
     override fun onResume() {
         super.onResume()
-        // Re-apply settings that may have changed
+        applyFullscreen()
+        val tf = prefs.launcherTypeface()
         adapter.fontSizeSp = prefs.fontSizeSp()
+        adapter.typeface   = tf
+        binding.etSearch.typeface = tf
         refreshLayoutMode()
         loadApps()
     }
 
-    // onWindowFocusChanged is the correct place to show the soft keyboard —
-    // the window is fully laid out and attached by this point.
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        if (hasFocus && prefs.autoKeyboard) {
+        if (hasFocus && prefs.autoKeyboard && !adapter.selectionMode) {
             binding.etSearch.requestFocus()
             (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
                 .showSoftInput(binding.etSearch, InputMethodManager.SHOW_IMPLICIT)
@@ -89,8 +119,8 @@ class AppDrawerActivity : AppCompatActivity() {
         unregisterReceiver(packageReceiver)
     }
 
-    // Slide down when exiting — use the non-deprecated API on API 34+
     override fun finish() {
+        binding.root.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
         if (Build.VERSION.SDK_INT >= 34) {
             overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, R.anim.slide_down_out)
         }
@@ -111,13 +141,10 @@ class AppDrawerActivity : AppCompatActivity() {
             ): Boolean {
                 val dy = e2.y - (e1?.y ?: 0f)
                 val dx = abs(e2.x - (e1?.x ?: 0f))
-                // Only close on a clearly downward fling, not a sideways one
                 if (dy > 120f && velocityY > 400f && dy > dx) {
                     val lm = binding.rvApps.layoutManager as? LinearLayoutManager
-                    // Only dismiss if the list is scrolled to the very top
                     if (lm == null || lm.findFirstCompletelyVisibleItemPosition() == 0) {
-                        finish()
-                        return true
+                        finish(); return true
                     }
                 }
                 return false
@@ -125,8 +152,6 @@ class AppDrawerActivity : AppCompatActivity() {
         })
     }
 
-    // dispatchTouchEvent so the gesture detector sees events even when
-    // the RecyclerView consumes them (e.g. while scrolling).
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         swipeDownDetector.onTouchEvent(ev)
         return super.dispatchTouchEvent(ev)
@@ -137,16 +162,26 @@ class AppDrawerActivity : AppCompatActivity() {
     private fun setupAppList() {
         adapter = AppListAdapter(
             onAppClick = { app ->
-                binding.root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-                launchApp(app)
+                if (adapter.selectionMode) {
+                    // In selection mode taps toggle the item
+                    binding.root.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                    adapter.toggleSelection(app.packageName)
+                    val count = adapter.selectedPackages.size
+                    if (count == 0) exitSelectionMode()
+                    else updateSelectionCount(count)
+                } else {
+                    binding.root.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                    launchApp(app)
+                }
             },
             onAppLongClick = { app ->
-                binding.root.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                binding.root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                 showAppOptions(app)
                 true
             }
         )
         binding.rvApps.adapter = adapter
+        binding.rvApps.itemAnimator = null
         refreshLayoutMode()
     }
 
@@ -188,6 +223,7 @@ class AppDrawerActivity : AppCompatActivity() {
             .filter { it.packageName != packageName && it.packageName !in hidden }
 
         refreshList()
+        scheduleListAnimation()
     }
 
     private fun buildListItems(): List<AppListAdapter.Item> {
@@ -196,7 +232,6 @@ class AppDrawerActivity : AppCompatActivity() {
                 .filter { it.label.contains(currentQuery.trim(), ignoreCase = true) }
                 .map { AppListAdapter.Item.App(it) }
         }
-        // Build sectioned list grouped by first character
         val items = mutableListOf<AppListAdapter.Item>()
         var currentSection: Char? = null
         allApps.forEach { app ->
@@ -215,12 +250,10 @@ class AppDrawerActivity : AppCompatActivity() {
         val map = mutableMapOf<Char, Int>()
         items.forEachIndexed { index, item ->
             when (item) {
-                // Prefer mapping the letter to its section header position
                 is AppListAdapter.Item.Header -> {
                     val ch = item.title.firstOrNull()?.uppercaseChar() ?: return@forEachIndexed
                     if (ch in 'A'..'Z') map[ch] = index
                 }
-                // Fall back to first app if no header (e.g. during search)
                 is AppListAdapter.Item.App -> {
                     val ch = item.info.label.firstOrNull()?.uppercaseChar() ?: return@forEachIndexed
                     if (ch in 'A'..'Z' && ch !in map) map[ch] = index
@@ -230,15 +263,38 @@ class AppDrawerActivity : AppCompatActivity() {
         return map
     }
 
+    private var isFirstLoad = true
+
+    private fun scheduleListAnimation() {
+        if (!isFirstLoad) return
+        isFirstLoad = false
+        val anim = AnimationUtils.loadAnimation(this, R.anim.item_fade_slide_in)
+        val controller = LayoutAnimationController(anim).apply { delay = 0.04f }
+        binding.rvApps.layoutAnimation = controller
+        binding.rvApps.scheduleLayoutAnimation()
+    }
+
     private fun refreshList() {
         val items = buildListItems()
         adapter.submitList(items)
         letterPositionMap = buildLetterMap(items)
 
         val searching = currentQuery.isNotBlank()
-        binding.alphabetIndex.visibility = if (searching) View.GONE  else View.VISIBLE
-        binding.tvWebSearch.visibility   = if (searching) View.VISIBLE else View.GONE
-        if (searching) binding.tvWebSearch.text = "Search the web for \"$currentQuery\""
+        binding.alphabetIndex.visibility = if (searching) View.GONE else View.VISIBLE
+        if (searching) {
+            binding.tvWebSearch.text = "Search the web for \"$currentQuery\""
+            if (binding.tvWebSearch.visibility != View.VISIBLE) {
+                binding.tvWebSearch.alpha = 0f
+                binding.tvWebSearch.visibility = View.VISIBLE
+                binding.tvWebSearch.animate().alpha(1f).setDuration(150).start()
+            }
+        } else {
+            if (binding.tvWebSearch.visibility == View.VISIBLE) {
+                binding.tvWebSearch.animate().alpha(0f).setDuration(100).withEndAction {
+                    binding.tvWebSearch.visibility = View.GONE
+                }.start()
+            }
+        }
     }
 
     // ─── Search ───────────────────────────────────────────────────────────────
@@ -252,13 +308,11 @@ class AppDrawerActivity : AppCompatActivity() {
                 refreshList()
             }
         })
-
         binding.etSearch.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 launchWebSearch(binding.etSearch.text.toString()); true
             } else false
         }
-
         binding.tvWebSearch.setOnClickListener { launchWebSearch(binding.etSearch.text.toString()) }
     }
 
@@ -286,9 +340,100 @@ class AppDrawerActivity : AppCompatActivity() {
         registerReceiver(packageReceiver, packageReceiver.buildIntentFilter())
     }
 
+    // ─── Selection mode ───────────────────────────────────────────────────────
+
+    private fun setupSelectionBar() {
+        binding.btnCancelSelection.setOnClickListener { exitSelectionMode() }
+        binding.btnUninstall.setOnClickListener       { confirmUninstall() }
+    }
+
+    private fun enterSelectionMode(app: AppInfo) {
+        hideKeyboard()
+        adapter.enterSelectionMode(app.packageName)
+        updateSelectionCount(1)
+        setSelectionBarVisible(true)
+    }
+
+    private fun exitSelectionMode() {
+        adapter.clearSelection()
+        setSelectionBarVisible(false)
+    }
+
+    private fun updateSelectionCount(count: Int) {
+        binding.tvSelectionCount.text = if (count == 1) "1 app selected" else "$count apps selected"
+    }
+
+    private fun setSelectionBarVisible(visible: Boolean) {
+        val bar = binding.barSelection
+        if (visible) {
+            bar.alpha = 0f
+            bar.visibility = View.VISIBLE
+            bar.animate().alpha(1f).setDuration(180).start()
+        } else {
+            bar.animate().alpha(0f).setDuration(140).withEndAction {
+                bar.visibility = View.GONE
+            }.start()
+        }
+    }
+
+    // ─── Batch uninstall ──────────────────────────────────────────────────────
+
+    private fun confirmUninstall() {
+        val pkgs  = adapter.selectedPackages.toList()
+        if (pkgs.isEmpty()) return
+        val names = pkgs.mapNotNull { pkg -> allApps.firstOrNull { it.packageName == pkg }?.label }
+        val message = if (names.size == 1)
+            "Uninstall ${names[0]}?"
+        else
+            "Uninstall ${names.size} apps?\n\n${names.joinToString("\n")}"
+
+        AlertDialog.Builder(this)
+            .setMessage(message)
+            .setPositiveButton("Uninstall") { _, _ ->
+                exitSelectionMode()
+                uninstallQueue.clear()
+                uninstallQueue.addAll(pkgs)
+                uninstallNext()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun uninstallNext() {
+        val pkg = uninstallQueue.removeFirstOrNull() ?: run { loadApps(); return }
+        uninstallLauncher.launch(
+            Intent(Intent.ACTION_DELETE, Uri.parse("package:$pkg"))
+        )
+    }
+
     // ─── App actions ──────────────────────────────────────────────────────────
 
     private fun launchApp(app: AppInfo) {
+        if (prefs.isBlocked(app.packageName)) {
+            showBlockedDialog(app)
+            return
+        }
+        doLaunchApp(app)
+    }
+
+    private fun showBlockedDialog(app: AppInfo) {
+        hideKeyboard()
+        val builder = AlertDialog.Builder(this)
+            .setTitle("opening ${app.label.lowercase()}.")
+        if (prefs.isWindDownActive()) {
+            builder
+                .setMessage("it's past ${prefs.windDownTime}. wind-down mode is on.\nthis one can wait until tomorrow.")
+                .setNegativeButton("ok", null)
+        } else {
+            builder
+                .setMessage("this app is on your distraction list.\ndo you really want to open it?")
+                .setPositiveButton("open it") { _, _ -> doLaunchApp(app) }
+                .setNegativeButton("not right now", null)
+        }
+        builder.show()
+    }
+
+    private fun doLaunchApp(app: AppInfo) {
         hideKeyboard()
         prefs.recordLaunch(app.packageName)
         val intent = Intent(Intent.ACTION_MAIN).apply {
@@ -296,12 +441,8 @@ class AppDrawerActivity : AppCompatActivity() {
             setClassName(app.packageName, app.activityName)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
         }
-        try {
-            startActivity(intent)
-            finish()
-        } catch (_: Exception) {
-            Toast.makeText(this, "Could not open ${app.label}", Toast.LENGTH_SHORT).show()
-        }
+        try { startActivity(intent); finish() }
+        catch (_: Exception) { Toast.makeText(this, "Could not open ${app.label}", Toast.LENGTH_SHORT).show() }
     }
 
     private fun openAppInfo(app: AppInfo) {
@@ -317,21 +458,28 @@ class AppDrawerActivity : AppCompatActivity() {
             .setTitle(app.label)
             .setItems(arrayOf(
                 if (isOnHome) "Remove from home screen" else "Add to home screen",
-                "App info",
-                "Hide from list"
+                "Uninstall",
+                "Hide from list",
+                "App info"
             )) { _, which ->
                 when (which) {
                     0 -> { prefs.togglePin(app.packageName); refreshList() }
-                    1 -> openAppInfo(app)
+                    1 -> uninstallSingle(app)
                     2 -> { prefs.hideApp(app.packageName); loadApps() }
+                    3 -> openAppInfo(app)
                 }
             }
             .show()
+    }
+
+    private fun uninstallSingle(app: AppInfo) {
+        uninstallQueue.clear()
+        uninstallQueue.add(app.packageName)
+        uninstallNext()
     }
 
     private fun hideKeyboard() {
         (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
             .hideSoftInputFromWindow(binding.etSearch.windowToken, 0)
     }
-
 }

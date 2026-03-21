@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Compact two-column grid cell.
+    Slightly smaller vertical padding than the list item to fit more apps on screen.
+-->
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tv_app_label"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/app_item_bg"
+    android:clickable="true"
+    android:focusable="true"
+    android:fontFamily="sans-serif-light"
+    android:paddingStart="@dimen/margin_h"
+    android:paddingEnd="8dp"
+    android:paddingTop="11dp"
+    android:paddingBottom="11dp"
+    android:maxLines="2"
+    android:ellipsize="end"
+    android:textColor="@color/white"
+    android:textSize="14sp" />
