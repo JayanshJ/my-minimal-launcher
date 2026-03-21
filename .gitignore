@@ -1,0 +1,25 @@
+# Local configuration — contains keystore credentials, SDK path etc.
+# NEVER commit this to a public repo
+local.properties
+
+# Keystore files
+*.jks
+*.keystore
+
+# Android build outputs
+build/
+app/build/
+.gradle/
+
+# IDE files
+.idea/
+*.iml
+.DS_Store
+
+# Kotlin / Java compiled
+*.class
+*.jar (not release)
+
+# Release outputs (upload to Play Console directly, don't commit)
+app/release/
+app/build/outputs/

@@ -11,7 +11,7 @@ import java.net.URL
  */
 object WeatherManager {
 
-    data class WeatherData(val display: String)
+    data class WeatherData(val display: String, val code: Int = -1)
 
     /**
      * Performs a blocking network call — must be called from a coroutine
@@ -38,7 +38,7 @@ object WeatherManager {
                     append("%.0f%s".format(temp, suffix))
                     if (label.isNotEmpty()) append("  $label")
                 }
-                WeatherData(display)
+                WeatherData(display, code)
             } catch (_: Exception) {
                 null
             }

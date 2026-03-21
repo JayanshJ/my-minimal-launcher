@@ -43,7 +43,7 @@ class PrefsManager(context: Context) {
     // ── Pomodoro timer visibility ─────────────────────────────────────────────
 
     var showTimer: Boolean
-        get() = prefs.getBoolean(KEY_SHOW_TIMER, true)
+        get() = prefs.getBoolean(KEY_SHOW_TIMER, false)
         set(value) { prefs.edit().putBoolean(KEY_SHOW_TIMER, value).apply() }
 
     // ── Temperature unit: "celsius" | "fahrenheit" ────────────────────────────

@@ -218,8 +218,11 @@ class MainActivity : AppCompatActivity() {
             "right"  -> Triple(Gravity.END,               0, marginH)
             else     -> Triple(Gravity.START,        marginH, 0)
         }
+        // tv_date is inside a FrameLayout — just set text gravity, layout is match_parent
+        binding.tvDate.gravity = gravity
+
         listOf(
-            binding.tvGreeting, binding.tvClock, binding.tvDate,
+            binding.tvGreeting, binding.tvClock,
             binding.tvWidget, binding.tvTimerTime, binding.tvTimerLabel,
             binding.tvFocusAction
         ).forEach { tv ->
