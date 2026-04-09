@@ -3,6 +3,7 @@ package com.minimal.launcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.net.HttpURLConnection
 import java.net.URL
 
 /**
@@ -21,12 +22,16 @@ object WeatherManager {
         withContext(Dispatchers.IO) {
             try {
                 val unit = if (useFahrenheit) "fahrenheit" else "celsius"
-                val raw  = URL(
+                val conn = (URL(
                     "https://api.open-meteo.com/v1/forecast" +
                     "?latitude=$lat&longitude=$lon" +
                     "&current_weather=true" +
                     "&temperature_unit=$unit"
-                ).readText()
+                ).openConnection() as HttpURLConnection).apply {
+                    connectTimeout = 8_000
+                    readTimeout    = 8_000
+                }
+                val raw = conn.inputStream.bufferedReader().use { it.readText() }
 
                 val current = JSONObject(raw).getJSONObject("current_weather")
                 val temp    = current.getDouble("temperature")
