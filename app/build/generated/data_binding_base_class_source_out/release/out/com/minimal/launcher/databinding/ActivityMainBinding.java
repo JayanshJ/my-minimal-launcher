@@ -65,6 +65,9 @@ public final class ActivityMainBinding implements ViewBinding {
   public final TextView tvEmptyHint;
 
   @NonNull
+  public final TextView tvFocusAction;
+
+  @NonNull
   public final TextView tvGreeting;
 
   @NonNull
@@ -82,8 +85,8 @@ public final class ActivityMainBinding implements ViewBinding {
       @NonNull TextView tourBody, @NonNull TextView tourHint, @NonNull FrameLayout tourOverlay,
       @NonNull TextView tourTitle, @NonNull LinearLayout tourTooltip, @NonNull TextView tvClock,
       @NonNull TextView tvDate, @NonNull TextView tvDrawerHint, @NonNull TextView tvEmptyHint,
-      @NonNull TextView tvGreeting, @NonNull TextView tvTimerLabel, @NonNull TextView tvTimerTime,
-      @NonNull TextView tvWidget) {
+      @NonNull TextView tvFocusAction, @NonNull TextView tvGreeting, @NonNull TextView tvTimerLabel,
+      @NonNull TextView tvTimerTime, @NonNull TextView tvWidget) {
     this.rootView = rootView;
     this.homeAppsContainer = homeAppsContainer;
     this.homeContent = homeContent;
@@ -99,6 +102,7 @@ public final class ActivityMainBinding implements ViewBinding {
     this.tvDate = tvDate;
     this.tvDrawerHint = tvDrawerHint;
     this.tvEmptyHint = tvEmptyHint;
+    this.tvFocusAction = tvFocusAction;
     this.tvGreeting = tvGreeting;
     this.tvTimerLabel = tvTimerLabel;
     this.tvTimerTime = tvTimerTime;
@@ -212,6 +216,12 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.tv_focus_action;
+      TextView tvFocusAction = ViewBindings.findChildViewById(rootView, id);
+      if (tvFocusAction == null) {
+        break missingId;
+      }
+
       id = R.id.tv_greeting;
       TextView tvGreeting = ViewBindings.findChildViewById(rootView, id);
       if (tvGreeting == null) {
@@ -238,8 +248,8 @@ public final class ActivityMainBinding implements ViewBinding {
 
       return new ActivityMainBinding((FrameLayout) rootView, homeAppsContainer, homeContent, root,
           rvHomeApps, spotlightView, tourBody, tourHint, tourOverlay, tourTitle, tourTooltip,
-          tvClock, tvDate, tvDrawerHint, tvEmptyHint, tvGreeting, tvTimerLabel, tvTimerTime,
-          tvWidget);
+          tvClock, tvDate, tvDrawerHint, tvEmptyHint, tvFocusAction, tvGreeting, tvTimerLabel,
+          tvTimerTime, tvWidget);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

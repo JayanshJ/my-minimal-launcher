@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.minimal.launcher"
-    android:versionCode="2"
-    android:versionName="1.1" >
+    android:versionCode="3"
+    android:versionName="1.2" >
 
     <uses-sdk
         android:minSdkVersion="29"
@@ -10,9 +10,6 @@
 
     <!-- Full app list on Android 11+ -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
-
-    <!-- Calendar events widget -->
-    <uses-permission android:name="android.permission.READ_CALENDAR" />
 
     <!-- Weather fetch -->
     <uses-permission android:name="android.permission.INTERNET" />

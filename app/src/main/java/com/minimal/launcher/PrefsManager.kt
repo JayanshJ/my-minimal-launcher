@@ -270,10 +270,8 @@ class PrefsManager(context: Context) {
         prefs.getInt("$KEY_LAUNCH_PREFIX$packageName", 0)
 
     fun getFrequent(pool: List<AppInfo>, limit: Int = 5): List<AppInfo> =
-        pool.map { it to getLaunchCount(it.packageName) }
-            .filter { (_, count) -> count > 0 }
-            .sortedByDescending { (_, count) -> count }
-            .map { (app, _) -> app }
+        pool.filter { getLaunchCount(it.packageName) > 0 }
+            .sortedByDescending { getLaunchCount(it.packageName) }
             .take(limit)
 
     // ─────────────────────────────────────────────────────────────────────────

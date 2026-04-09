@@ -1169,6 +1169,9 @@ id on
 id onInterceptTouchReturnSwipe
 id opt_12h
 id opt_24h
+id opt_align_center
+id opt_align_left
+id opt_align_right
 id opt_celsius
 id opt_clock_large
 id opt_clock_medium
@@ -1194,6 +1197,8 @@ id opt_padding_relaxed
 id opt_padding_spacious
 id opt_statusbar_hide
 id opt_statusbar_show
+id opt_sunrise_hide
+id opt_sunrise_show
 id opt_timer_hide
 id opt_timer_show
 id opt_ui_light
@@ -1318,6 +1323,7 @@ id tv_close_handle
 id tv_date
 id tv_drawer_hint
 id tv_empty_hint
+id tv_focus_action
 id tv_greeting
 id tv_section_header
 id tv_selection_count

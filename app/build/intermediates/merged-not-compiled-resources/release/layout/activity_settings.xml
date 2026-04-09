@@ -48,6 +48,18 @@
                 android:text="tap to set" />
         </LinearLayout>
 
+        <!-- alignment -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="alignment" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_align_left"   style="@style/Opt" android:text="left" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_align_center" style="@style/Opt" android:text="center" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_align_right"  style="@style/Opt" android:text="right" />
+            </LinearLayout>
+        </LinearLayout>
+
         <!-- status bar -->
         <LinearLayout style="@style/SettingRow">
             <TextView style="@style/RowLabel" android:text="status bar" />
@@ -177,6 +189,16 @@
                 <TextView android:id="@+id/opt_celsius"    style="@style/Opt" android:text="°C" />
                 <TextView style="@style/Dot" />
                 <TextView android:id="@+id/opt_fahrenheit" style="@style/Opt" android:text="°F" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- sunrise / sunset -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="sunrise/sunset" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_sunrise_show" style="@style/Opt" android:text="show" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_sunrise_hide" style="@style/Opt" android:text="hide" />
             </LinearLayout>
         </LinearLayout>
 

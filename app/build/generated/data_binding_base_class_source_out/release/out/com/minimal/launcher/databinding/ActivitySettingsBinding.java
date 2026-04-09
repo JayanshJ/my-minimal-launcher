@@ -39,6 +39,15 @@ public final class ActivitySettingsBinding implements ViewBinding {
   public final TextView opt24h;
 
   @NonNull
+  public final TextView optAlignCenter;
+
+  @NonNull
+  public final TextView optAlignLeft;
+
+  @NonNull
+  public final TextView optAlignRight;
+
+  @NonNull
   public final TextView optCelsius;
 
   @NonNull
@@ -114,6 +123,12 @@ public final class ActivitySettingsBinding implements ViewBinding {
   public final TextView optStatusbarShow;
 
   @NonNull
+  public final TextView optSunriseHide;
+
+  @NonNull
+  public final TextView optSunriseShow;
+
+  @NonNull
   public final TextView optTimerHide;
 
   @NonNull
@@ -155,18 +170,20 @@ public final class ActivitySettingsBinding implements ViewBinding {
   private ActivitySettingsBinding(@NonNull ScrollView rootView, @NonNull TextView btnBlockApp,
       @NonNull TextView btnHideApp, @NonNull LinearLayout llBlockedApps,
       @NonNull LinearLayout llHiddenApps, @NonNull TextView opt12h, @NonNull TextView opt24h,
-      @NonNull TextView optCelsius, @NonNull TextView optClockLarge,
-      @NonNull TextView optClockMedium, @NonNull TextView optClockSmall,
-      @NonNull TextView optDaysUntil, @NonNull TextView optFahrenheit,
-      @NonNull TextView optFontLarge, @NonNull TextView optFontMedium,
-      @NonNull TextView optFontMono, @NonNull TextView optFontSans, @NonNull TextView optFontSerif,
-      @NonNull TextView optFontSmall, @NonNull TextView optGestureLeft,
-      @NonNull TextView optGestureRight, @NonNull TextView optGrid,
-      @NonNull TextView optKeyboardOff, @NonNull TextView optKeyboardOn, @NonNull TextView optList,
-      @NonNull TextView optName, @NonNull TextView optPaddingCompact,
+      @NonNull TextView optAlignCenter, @NonNull TextView optAlignLeft,
+      @NonNull TextView optAlignRight, @NonNull TextView optCelsius,
+      @NonNull TextView optClockLarge, @NonNull TextView optClockMedium,
+      @NonNull TextView optClockSmall, @NonNull TextView optDaysUntil,
+      @NonNull TextView optFahrenheit, @NonNull TextView optFontLarge,
+      @NonNull TextView optFontMedium, @NonNull TextView optFontMono, @NonNull TextView optFontSans,
+      @NonNull TextView optFontSerif, @NonNull TextView optFontSmall,
+      @NonNull TextView optGestureLeft, @NonNull TextView optGestureRight,
+      @NonNull TextView optGrid, @NonNull TextView optKeyboardOff, @NonNull TextView optKeyboardOn,
+      @NonNull TextView optList, @NonNull TextView optName, @NonNull TextView optPaddingCompact,
       @NonNull TextView optPaddingDefault, @NonNull TextView optPaddingRelaxed,
       @NonNull TextView optPaddingSpacious, @NonNull TextView optStatusbarHide,
-      @NonNull TextView optStatusbarShow, @NonNull TextView optTimerHide,
+      @NonNull TextView optStatusbarShow, @NonNull TextView optSunriseHide,
+      @NonNull TextView optSunriseShow, @NonNull TextView optTimerHide,
       @NonNull TextView optTimerShow, @NonNull TextView optUiLight, @NonNull TextView optUiMedium,
       @NonNull TextView optUiRegular, @NonNull TextView optUiThin, @NonNull TextView optWeightLight,
       @NonNull TextView optWeightRegular, @NonNull TextView optWeightThin,
@@ -179,6 +196,9 @@ public final class ActivitySettingsBinding implements ViewBinding {
     this.llHiddenApps = llHiddenApps;
     this.opt12h = opt12h;
     this.opt24h = opt24h;
+    this.optAlignCenter = optAlignCenter;
+    this.optAlignLeft = optAlignLeft;
+    this.optAlignRight = optAlignRight;
     this.optCelsius = optCelsius;
     this.optClockLarge = optClockLarge;
     this.optClockMedium = optClockMedium;
@@ -204,6 +224,8 @@ public final class ActivitySettingsBinding implements ViewBinding {
     this.optPaddingSpacious = optPaddingSpacious;
     this.optStatusbarHide = optStatusbarHide;
     this.optStatusbarShow = optStatusbarShow;
+    this.optSunriseHide = optSunriseHide;
+    this.optSunriseShow = optSunriseShow;
     this.optTimerHide = optTimerHide;
     this.optTimerShow = optTimerShow;
     this.optUiLight = optUiLight;
@@ -279,6 +301,24 @@ public final class ActivitySettingsBinding implements ViewBinding {
       id = R.id.opt_24h;
       TextView opt24h = ViewBindings.findChildViewById(rootView, id);
       if (opt24h == null) {
+        break missingId;
+      }
+
+      id = R.id.opt_align_center;
+      TextView optAlignCenter = ViewBindings.findChildViewById(rootView, id);
+      if (optAlignCenter == null) {
+        break missingId;
+      }
+
+      id = R.id.opt_align_left;
+      TextView optAlignLeft = ViewBindings.findChildViewById(rootView, id);
+      if (optAlignLeft == null) {
+        break missingId;
+      }
+
+      id = R.id.opt_align_right;
+      TextView optAlignRight = ViewBindings.findChildViewById(rootView, id);
+      if (optAlignRight == null) {
         break missingId;
       }
 
@@ -432,6 +472,18 @@ public final class ActivitySettingsBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.opt_sunrise_hide;
+      TextView optSunriseHide = ViewBindings.findChildViewById(rootView, id);
+      if (optSunriseHide == null) {
+        break missingId;
+      }
+
+      id = R.id.opt_sunrise_show;
+      TextView optSunriseShow = ViewBindings.findChildViewById(rootView, id);
+      if (optSunriseShow == null) {
+        break missingId;
+      }
+
       id = R.id.opt_timer_hide;
       TextView optTimerHide = ViewBindings.findChildViewById(rootView, id);
       if (optTimerHide == null) {
@@ -511,11 +563,12 @@ public final class ActivitySettingsBinding implements ViewBinding {
       }
 
       return new ActivitySettingsBinding((ScrollView) rootView, btnBlockApp, btnHideApp,
-          llBlockedApps, llHiddenApps, opt12h, opt24h, optCelsius, optClockLarge, optClockMedium,
-          optClockSmall, optDaysUntil, optFahrenheit, optFontLarge, optFontMedium, optFontMono,
-          optFontSans, optFontSerif, optFontSmall, optGestureLeft, optGestureRight, optGrid,
-          optKeyboardOff, optKeyboardOn, optList, optName, optPaddingCompact, optPaddingDefault,
-          optPaddingRelaxed, optPaddingSpacious, optStatusbarHide, optStatusbarShow, optTimerHide,
+          llBlockedApps, llHiddenApps, opt12h, opt24h, optAlignCenter, optAlignLeft, optAlignRight,
+          optCelsius, optClockLarge, optClockMedium, optClockSmall, optDaysUntil, optFahrenheit,
+          optFontLarge, optFontMedium, optFontMono, optFontSans, optFontSerif, optFontSmall,
+          optGestureLeft, optGestureRight, optGrid, optKeyboardOff, optKeyboardOn, optList, optName,
+          optPaddingCompact, optPaddingDefault, optPaddingRelaxed, optPaddingSpacious,
+          optStatusbarHide, optStatusbarShow, optSunriseHide, optSunriseShow, optTimerHide,
           optTimerShow, optUiLight, optUiMedium, optUiRegular, optUiThin, optWeightLight,
           optWeightRegular, optWeightThin, optWindDownOff, optWindDownOn, optWindDownTime,
           optWorldClock);

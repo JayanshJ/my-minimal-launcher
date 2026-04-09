@@ -12,7 +12,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
-import android.database.Cursor
 import android.graphics.Color
 import android.location.LocationManager
 import android.net.Uri
@@ -23,7 +22,6 @@ import android.os.Handler
 import android.os.Looper
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.provider.CalendarContract
 import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -80,11 +78,6 @@ class MainActivity : AppCompatActivity() {
     private var clockFmt = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
     private val dateFmt  = SimpleDateFormat("EEEE, d MMMM", Locale.getDefault())
     private val ampmFmt  = SimpleDateFormat("a", Locale.getDefault())
-
-    // Calendar widget
-    private val calendarHandler = Handler(Looper.getMainLooper())
-    private val calendarRefreshRunnable = Runnable { loadCalendarEvents() }
-    private var calendarText: String = ""
 
     // Battery
     private var batteryText: String = ""
@@ -281,7 +274,6 @@ class MainActivity : AppCompatActivity() {
         updateClock()
         refreshBattery()
         refreshScreenTime()
-        loadCalendarEvents()
         refreshWeather()
         updateDaysUntil()
         if (prefs.hasLastLocation()) {
@@ -305,7 +297,6 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         clockHandler.removeCallbacksAndMessages(null)
-        calendarHandler.removeCallbacksAndMessages(null)
         weatherHandler.removeCallbacksAndMessages(null)
         timerHandler.removeCallbacksAndMessages(null)
         unregisterReceiver(packageReceiver)
@@ -418,7 +409,7 @@ class MainActivity : AppCompatActivity() {
         updateWidgetText()
     }
 
-    // ─── Widget (weather + calendar combined) ─────────────────────────────────
+    // ─── Widget ───────────────────────────────────────────────────────────────
 
     private fun updateWidgetText() {
         val parts = mutableListOf<String>()
@@ -430,7 +421,7 @@ class MainActivity : AppCompatActivity() {
         if (screenTimeText.isNotEmpty()) parts.add(screenTimeText)
         if (worldClockText.isNotEmpty()) parts.add(worldClockText)
         if (daysUntilText.isNotEmpty())  parts.add(daysUntilText)
-        if (calendarText.isNotEmpty())   parts.add(calendarText)
+
         val newText = parts.joinToString("\n")
         if (newText == lastWidgetText) return
         lastWidgetText = newText
@@ -513,10 +504,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestRuntimePermissions() {
         val needed = buildList {
-            if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.READ_CALENDAR)
-                    != PackageManager.PERMISSION_GRANTED) add(Manifest.permission.READ_CALENDAR)
-            else loadCalendarEvents()
-
             if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.ACCESS_COARSE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) add(Manifest.permission.ACCESS_COARSE_LOCATION)
             else refreshWeather()
@@ -553,8 +540,6 @@ class MainActivity : AppCompatActivity() {
         weatherHandler.postDelayed(weatherRefreshRunnable, 15 * 60 * 1_000L)
     }
 
-    // ─── Calendar ─────────────────────────────────────────────────────────────
-
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
@@ -563,7 +548,6 @@ class MainActivity : AppCompatActivity() {
             permissions.forEachIndexed { i, perm ->
                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                     when (perm) {
-                        Manifest.permission.READ_CALENDAR          -> loadCalendarEvents()
                         Manifest.permission.ACCESS_COARSE_LOCATION -> refreshWeather()
                     }
                 }
@@ -578,54 +562,6 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == REQ_ROLE_HOME) { /* role result handled */ }
     }
 
-    private fun loadCalendarEvents() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR)
-                != PackageManager.PERMISSION_GRANTED) return
-
-        val now = System.currentTimeMillis()
-        val end = now + 24 * 60 * 60 * 1_000L
-        val timeFmt = SimpleDateFormat("HH:mm", Locale.getDefault())
-
-        val projection = arrayOf(
-            CalendarContract.Events.TITLE,
-            CalendarContract.Events.DTSTART,
-            CalendarContract.Events.ALL_DAY
-        )
-        val selection =
-            "${CalendarContract.Events.DTSTART} >= ? AND " +
-            "${CalendarContract.Events.DTSTART} <= ? AND " +
-            "${CalendarContract.Events.DELETED} = 0"
-
-        var cursor: Cursor? = null
-        try {
-            cursor = contentResolver.query(
-                CalendarContract.Events.CONTENT_URI, projection, selection,
-                arrayOf(now.toString(), end.toString()),
-                "${CalendarContract.Events.DTSTART} ASC LIMIT 3"
-            )
-            val events = mutableListOf<String>()
-            cursor?.let {
-                val ti = it.getColumnIndex(CalendarContract.Events.TITLE)
-                val si = it.getColumnIndex(CalendarContract.Events.DTSTART)
-                val ai = it.getColumnIndex(CalendarContract.Events.ALL_DAY)
-                while (it.moveToNext()) {
-                    val title = it.getString(ti) ?: continue
-                    events.add(
-                        if (it.getInt(ai) == 1) title
-                        else "${timeFmt.format(Date(it.getLong(si)))}  $title"
-                    )
-                }
-            }
-            calendarText = events.joinToString("\n")
-        } catch (_: Exception) {
-            calendarText = ""
-        } finally {
-            cursor?.close()
-        }
-        updateWidgetText()
-        calendarHandler.removeCallbacks(calendarRefreshRunnable)
-        calendarHandler.postDelayed(calendarRefreshRunnable, 5 * 60 * 1_000L)
-    }
 
 
     // ─── Home app list ────────────────────────────────────────────────────────
@@ -1023,7 +959,7 @@ class MainActivity : AppCompatActivity() {
             TourStep(
                 { binding.tvWidget },
                 "info bar.",
-                "weather, battery, screen time, sunrise & sunset,\nworld clock, countdown and upcoming calendar events.\nall configurable in settings."
+                "weather, battery, screen time, sunrise & sunset,\nworld clock and countdown.\nall configurable in settings."
             ),
             TourStep(
                 { binding.tvTimerTime },
