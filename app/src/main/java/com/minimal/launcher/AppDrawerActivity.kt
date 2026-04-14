@@ -20,8 +20,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -41,10 +39,6 @@ class AppDrawerActivity : AppCompatActivity() {
     private var letterPositionMap: Map<Char, Int> = emptyMap()
     private lateinit var swipeDownDetector: GestureDetector
 
-    // Batch uninstall
-    private val uninstallQueue = ArrayDeque<String>()
-    private lateinit var uninstallLauncher: ActivityResultLauncher<Intent>
-
     // ─── Lifecycle ────────────────────────────────────────────────────────────
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,28 +51,19 @@ class AppDrawerActivity : AppCompatActivity() {
 
         prefs = PrefsManager(this)
 
-        // Register before any setup — must be called before onStart
-        uninstallLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { uninstallNext() }
-
         setupSwipeDown()
         setupAppList()
         setupSearch()
         setupAlphabetIndex()
         setupPackageReceiver()
-        setupSelectionBar()
         loadApps()
 
         binding.tvCloseHandle.setOnClickListener { finish() }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                when {
-                    adapter.selectionMode  -> exitSelectionMode()
-                    currentQuery.isNotEmpty() -> binding.etSearch.text.clear()
-                    else                   -> finish()
-                }
+                if (currentQuery.isNotEmpty()) binding.etSearch.text.clear()
+                else finish()
             }
         })
     }
@@ -107,7 +92,7 @@ class AppDrawerActivity : AppCompatActivity() {
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        if (hasFocus && prefs.autoKeyboard && !adapter.selectionMode) {
+        if (hasFocus && prefs.autoKeyboard) {
             binding.etSearch.requestFocus()
             (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
                 .showSoftInput(binding.etSearch, InputMethodManager.SHOW_IMPLICIT)
@@ -162,17 +147,8 @@ class AppDrawerActivity : AppCompatActivity() {
     private fun setupAppList() {
         adapter = AppListAdapter(
             onAppClick = { app ->
-                if (adapter.selectionMode) {
-                    // In selection mode taps toggle the item
-                    binding.root.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                    adapter.toggleSelection(app.packageName)
-                    val count = adapter.selectedPackages.size
-                    if (count == 0) exitSelectionMode()
-                    else updateSelectionCount(count)
-                } else {
-                    binding.root.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                    launchApp(app)
-                }
+                binding.root.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                launchApp(app)
             },
             onAppLongClick = { app ->
                 binding.root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
@@ -340,72 +316,6 @@ class AppDrawerActivity : AppCompatActivity() {
         registerReceiver(packageReceiver, packageReceiver.buildIntentFilter())
     }
 
-    // ─── Selection mode ───────────────────────────────────────────────────────
-
-    private fun setupSelectionBar() {
-        binding.btnCancelSelection.setOnClickListener { exitSelectionMode() }
-        binding.btnUninstall.setOnClickListener       { confirmUninstall() }
-    }
-
-    private fun enterSelectionMode(app: AppInfo) {
-        hideKeyboard()
-        adapter.enterSelectionMode(app.packageName)
-        updateSelectionCount(1)
-        setSelectionBarVisible(true)
-    }
-
-    private fun exitSelectionMode() {
-        adapter.clearSelection()
-        setSelectionBarVisible(false)
-    }
-
-    private fun updateSelectionCount(count: Int) {
-        binding.tvSelectionCount.text = if (count == 1) "1 app selected" else "$count apps selected"
-    }
-
-    private fun setSelectionBarVisible(visible: Boolean) {
-        val bar = binding.barSelection
-        if (visible) {
-            bar.alpha = 0f
-            bar.visibility = View.VISIBLE
-            bar.animate().alpha(1f).setDuration(180).start()
-        } else {
-            bar.animate().alpha(0f).setDuration(140).withEndAction {
-                bar.visibility = View.GONE
-            }.start()
-        }
-    }
-
-    // ─── Batch uninstall ──────────────────────────────────────────────────────
-
-    private fun confirmUninstall() {
-        val pkgs  = adapter.selectedPackages.toList()
-        if (pkgs.isEmpty()) return
-        val names = pkgs.mapNotNull { pkg -> allApps.firstOrNull { it.packageName == pkg }?.label }
-        val message = if (names.size == 1)
-            "Uninstall ${names[0]}?"
-        else
-            "Uninstall ${names.size} apps?\n\n${names.joinToString("\n")}"
-
-        AlertDialog.Builder(this)
-            .setMessage(message)
-            .setPositiveButton("Uninstall") { _, _ ->
-                exitSelectionMode()
-                uninstallQueue.clear()
-                uninstallQueue.addAll(pkgs)
-                uninstallNext()
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    private fun uninstallNext() {
-        val pkg = uninstallQueue.removeFirstOrNull() ?: run { loadApps(); return }
-        uninstallLauncher.launch(
-            Intent(Intent.ACTION_DELETE, Uri.parse("package:$pkg"))
-        )
-    }
-
     // ─── App actions ──────────────────────────────────────────────────────────
 
     private fun launchApp(app: AppInfo) {
@@ -458,24 +368,16 @@ class AppDrawerActivity : AppCompatActivity() {
             .setTitle(app.label)
             .setItems(arrayOf(
                 if (isOnHome) "Remove from home screen" else "Add to home screen",
-                "Uninstall",
                 "Hide from list",
                 "App info"
             )) { _, which ->
                 when (which) {
                     0 -> { prefs.togglePin(app.packageName); refreshList() }
-                    1 -> uninstallSingle(app)
-                    2 -> { prefs.hideApp(app.packageName); loadApps() }
-                    3 -> openAppInfo(app)
+                    1 -> { prefs.hideApp(app.packageName); loadApps() }
+                    2 -> openAppInfo(app)
                 }
             }
             .show()
-    }
-
-    private fun uninstallSingle(app: AppInfo) {
-        uninstallQueue.clear()
-        uninstallQueue.add(app.packageName)
-        uninstallNext()
     }
 
     private fun hideKeyboard() {
