@@ -170,6 +170,40 @@ class SettingsActivity : AppCompatActivity() {
         rebuildBlockedAppsUI()
         // Hidden apps list
         rebuildHiddenAppsUI()
+
+        // Dumb phone
+        if (AppLockManager.isDeviceOwner(this)) {
+            binding.tvDumbPhoneStatus.text =
+                "device owner active — uninstall and launcher change are fully blocked"
+            binding.tvDumbPhoneStatus.setTextColor(Color.parseColor("#4A7A4A"))
+        } else {
+            binding.tvDumbPhoneStatus.text =
+                "24-hour delay mode — uninstall and launcher change not blocked"
+            binding.tvDumbPhoneStatus.setTextColor(Color.parseColor("#666666"))
+        }
+
+        setSelected(binding.optDumbOn,  prefs.dumbPhoneEnabled)
+        setSelected(binding.optDumbOff, !prefs.dumbPhoneEnabled)
+
+        val pinSet = prefs.dumbPhonePin.isNotEmpty()
+        binding.btnSetPin.text = if (pinSet) "change pin →" else "set pin →"
+
+        // Countdown display
+        when {
+            prefs.isDisableCountdownExpired() -> {
+                actuallyDisable()
+            }
+            prefs.isDisableCountdownActive() -> {
+                val ms   = prefs.disableCountdownRemainingMs()
+                val hrs  = ms / (60 * 60 * 1000)
+                val mins = (ms % (60 * 60 * 1000)) / (60 * 1000)
+                binding.tvDumbCountdown.visibility = android.view.View.VISIBLE
+                binding.tvDumbCountdown.text =
+                    if (prefs.isInGracePeriod()) "disabling in ${hrs}h ${mins}m  ·  tap off again to cancel"
+                    else "disabling in ${hrs}h ${mins}m  ·  cannot be cancelled"
+            }
+            else -> binding.tvDumbCountdown.visibility = android.view.View.GONE
+        }
     }
 
     private fun setSelected(tv: TextView, selected: Boolean) {
@@ -278,6 +312,120 @@ class SettingsActivity : AppCompatActivity() {
 
         // Hide app
         binding.btnHideApp.setOnClickListener { pickAppToHide() }
+
+        // Dumb phone — enable lock mode
+        binding.optDumbOn.setOnClickListener {
+            if (!AppLockManager.isDeviceOwner(this)) {
+                AlertDialog.Builder(this)
+                    .setTitle("Device Owner Required")
+                    .setMessage("Run this command once via ADB (with the phone unlocked and USB debugging on):\n\nadb shell dpm set-device-owner com.minimal.launcher/.MinimalDeviceAdminReceiver\n\nThen come back and enable lock mode.")
+                    .setPositiveButton("OK", null)
+                    .show()
+                return@setOnClickListener
+            }
+            prefs.dumbPhoneEnabled = true
+            AppLockManager.applyRestrictions(this)
+            AppLockManager.applyWhitelist(this, prefs.getAllowedPackages())
+            applyAll()
+        }
+
+        // Dumb phone — disable (24h countdown, PIN to start, 5min grace to cancel)
+        binding.optDumbOff.setOnClickListener {
+            if (!prefs.dumbPhoneEnabled) return@setOnClickListener
+            when {
+                prefs.isDisableCountdownExpired() -> actuallyDisable()
+                prefs.isInGracePeriod() -> {
+                    // Grace period — offer to cancel
+                    AlertDialog.Builder(this)
+                        .setTitle("Cancel unlock request?")
+                        .setMessage("Stay locked? You have a few minutes to cancel.")
+                        .setPositiveButton("Stay locked") { _, _ ->
+                            prefs.disableRequestedAt = -1L
+                            applyAll()
+                        }
+                        .setNegativeButton("Keep countdown", null)
+                        .show()
+                }
+                prefs.isDisableCountdownActive() -> {
+                    // Past grace — just inform
+                    val ms   = prefs.disableCountdownRemainingMs()
+                    val hrs  = ms / (60 * 60 * 1000)
+                    val mins = (ms % (60 * 60 * 1000)) / (60 * 1000)
+                    AlertDialog.Builder(this)
+                        .setMessage("Lock mode will disable in ${hrs}h ${mins}m.\nThis cannot be cancelled.")
+                        .setPositiveButton("OK", null)
+                        .show()
+                }
+                else -> {
+                    // Start the 24h countdown (PIN required)
+                    requirePin {
+                        prefs.disableRequestedAt = System.currentTimeMillis()
+                        AlertDialog.Builder(this)
+                            .setTitle("Countdown started")
+                            .setMessage("Lock mode will turn off in 24 hours.\n\nYou have 5 minutes to cancel by tapping off again.")
+                            .setPositiveButton("OK", null)
+                            .show()
+                        applyAll()
+                    }
+                }
+            }
+        }
+
+        // Manage allowed apps (PIN required if PIN is set)
+        binding.btnManageApps.setOnClickListener {
+            requirePin {
+                startActivity(Intent(this, FocusAppsActivity::class.java))
+            }
+        }
+
+        // Set / change PIN
+        binding.btnSetPin.setOnClickListener { showSetPinDialog() }
+    }
+
+    /** Shows a PIN entry dialog. Calls [onSuccess] only if correct (or no PIN set). */
+    private fun requirePin(onSuccess: () -> Unit) {
+        val pin = prefs.dumbPhonePin
+        if (pin.isEmpty()) { onSuccess(); return }
+        val input = EditText(this).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER or
+                        android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+            hint = "enter pin"
+        }
+        AlertDialog.Builder(this)
+            .setTitle("PIN required")
+            .setView(input)
+            .setPositiveButton("OK") { _, _ ->
+                if (input.text.toString() == pin) onSuccess()
+                else AlertDialog.Builder(this).setMessage("Wrong PIN").setPositiveButton("OK", null).show()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun actuallyDisable() {
+        prefs.dumbPhoneEnabled     = false
+        prefs.disableRequestedAt   = -1L
+        AppLockManager.removeRestrictions(this)
+        AppLockManager.unsuspendAll(this)
+        applyAll()
+    }
+
+    private fun showSetPinDialog() {
+        val input = EditText(this).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER or
+                        android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+            hint = "new pin (leave empty to remove)"
+        }
+        AlertDialog.Builder(this)
+            .setTitle("Set PIN")
+            .setMessage("This PIN will be required to disable lock mode or change the allowed apps list.")
+            .setView(input)
+            .setPositiveButton("Save") { _, _ ->
+                prefs.dumbPhonePin = input.text.toString().trim()
+                applyAll()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     // ── World clock picker ────────────────────────────────────────────────────

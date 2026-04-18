@@ -266,6 +266,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        // Auto-disable dumb phone mode when 24h countdown expires
+        if (prefs.dumbPhoneEnabled && prefs.isDisableCountdownExpired()) {
+            prefs.dumbPhoneEnabled   = false
+            prefs.disableRequestedAt = -1L
+            AppLockManager.removeRestrictions(this)
+            AppLockManager.unsuspendAll(this)
+        }
         applyFullscreen()
         applyClockStyle()
         updateGreeting()
