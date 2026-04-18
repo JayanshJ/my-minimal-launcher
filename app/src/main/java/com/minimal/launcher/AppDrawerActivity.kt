@@ -1,7 +1,10 @@
 package com.minimal.launcher
 
+import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import android.net.Uri
@@ -28,6 +31,10 @@ import com.minimal.launcher.databinding.ActivityAppDrawerBinding
 import kotlin.math.abs
 
 class AppDrawerActivity : AppCompatActivity() {
+
+    private companion object {
+        const val RC_CONTACTS = 1001
+    }
 
     private lateinit var binding: ActivityAppDrawerBinding
     private lateinit var adapter: AppListAdapter
@@ -104,6 +111,13 @@ class AppDrawerActivity : AppCompatActivity() {
         unregisterReceiver(packageReceiver)
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == RC_CONTACTS) refreshList()
+    }
+
     override fun finish() {
         binding.root.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
         if (Build.VERSION.SDK_INT >= 34) {
@@ -154,11 +168,25 @@ class AppDrawerActivity : AppCompatActivity() {
                 binding.root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                 showAppOptions(app)
                 true
+            },
+            onSettingsClick = { action ->
+                try { startActivity(Intent(action)) }
+                catch (_: Exception) { startActivity(Intent(Settings.ACTION_SETTINGS)) }
+            },
+            onContactClick = { number ->
+                startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$number")))
             }
         )
         binding.rvApps.adapter = adapter
         binding.rvApps.itemAnimator = null
         refreshLayoutMode()
+
+        // Request contacts permission so search can surface contacts
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.READ_CONTACTS), RC_CONTACTS)
+        }
     }
 
     private fun refreshLayoutMode() {
@@ -204,10 +232,36 @@ class AppDrawerActivity : AppCompatActivity() {
 
     private fun buildListItems(): List<AppListAdapter.Item> {
         if (currentQuery.isNotBlank()) {
-            return allApps
-                .filter { it.label.contains(currentQuery.trim(), ignoreCase = true) }
-                .map { AppListAdapter.Item.App(it) }
+            val q = currentQuery.trim()
+            val items = mutableListOf<AppListAdapter.Item>()
+
+            // Settings matches
+            val settingsMatches = SearchProvider.searchSettings(q)
+            if (settingsMatches.isNotEmpty()) {
+                items.add(AppListAdapter.Item.Header("Settings"))
+                settingsMatches.forEach { items.add(AppListAdapter.Item.SettingsResult(it.label, it.action)) }
+            }
+
+            // Contact matches (only if permission granted)
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
+                    == PackageManager.PERMISSION_GRANTED) {
+                val contactMatches = SearchProvider.searchContacts(this, q)
+                if (contactMatches.isNotEmpty()) {
+                    items.add(AppListAdapter.Item.Header("Contacts"))
+                    contactMatches.forEach { items.add(AppListAdapter.Item.Contact(it.name, it.number)) }
+                }
+            }
+
+            // App matches
+            val appMatches = allApps.filter { it.label.contains(q, ignoreCase = true) }
+            if (appMatches.isNotEmpty()) {
+                if (items.isNotEmpty()) items.add(AppListAdapter.Item.Header("Apps"))
+                appMatches.forEach { items.add(AppListAdapter.Item.App(it)) }
+            }
+
+            return items
         }
+
         val items = mutableListOf<AppListAdapter.Item>()
         var currentSection: Char? = null
         allApps.forEach { app ->
@@ -234,6 +288,8 @@ class AppDrawerActivity : AppCompatActivity() {
                     val ch = item.info.label.firstOrNull()?.uppercaseChar() ?: return@forEachIndexed
                     if (ch in 'A'..'Z' && ch !in map) map[ch] = index
                 }
+                is AppListAdapter.Item.SettingsResult,
+                is AppListAdapter.Item.Contact -> Unit
             }
         }
         return map

@@ -253,6 +253,12 @@ class PrefsManager(context: Context) {
         get() = prefs.getBoolean(KEY_FULLSCREEN, false)
         set(value) { prefs.edit().putBoolean(KEY_FULLSCREEN, value).apply() }
 
+    // ── Home tab: "pinned" | "frequent" ──────────────────────────────────────
+
+    var homeTab: String
+        get() = prefs.getString(KEY_HOME_TAB, "pinned") ?: "pinned"
+        set(value) { prefs.edit().putString(KEY_HOME_TAB, value).apply() }
+
     // ── Dumb-phone / focus lock ───────────────────────────────────────────────
 
     /** Whether the OS-level app whitelist is currently active. */
@@ -360,6 +366,7 @@ class PrefsManager(context: Context) {
         private const val KEY_ONBOARDING     = "onboarding_done"
         private const val KEY_SHOW_SUNRISE    = "show_sunrise_sunset"
         private const val KEY_HOME_ALIGNMENT  = "home_alignment"
+        private const val KEY_HOME_TAB           = "home_tab"
         private const val KEY_DUMB_PHONE        = "dumb_phone_enabled"
         private const val KEY_DUMB_PIN          = "dumb_phone_pin"
         private const val KEY_ALLOWED           = "allowed_apps"

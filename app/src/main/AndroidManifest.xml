@@ -21,6 +21,9 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- Universal search — contact lookup -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <application
         android:name=".MinimalLauncherApp"
         android:allowBackup="false"

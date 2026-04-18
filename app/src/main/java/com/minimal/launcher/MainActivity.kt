@@ -589,6 +589,7 @@ class MainActivity : AppCompatActivity() {
         binding.rvHomeApps.layoutManager = LinearLayoutManager(this)
         binding.rvHomeApps.itemAnimator = null
         binding.rvHomeApps.overScrollMode = android.view.View.OVER_SCROLL_NEVER
+        setupHomeTabs()
     }
 
     private fun loadInstalledApps() {
@@ -610,10 +611,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadHomeApps() {
-        val pinned = prefs.getPinnedPackages()
-        val homeApps = allInstalledApps
-            .filter { it.packageName in pinned }
-            .sortedBy { it.label.lowercase() }
+        val homeApps = if (prefs.homeTab == "frequent") {
+            prefs.getFrequent(allInstalledApps, limit = 8)
+        } else {
+            val pinned = prefs.getPinnedPackages()
+            allInstalledApps
+                .filter { it.packageName in pinned }
+                .sortedBy { it.label.lowercase() }
+        }
 
         adapter.fontSizeSp = prefs.fontSizeSp()
         adapter.submitList(homeApps.map { AppListAdapter.Item.App(it) })
@@ -621,6 +626,25 @@ class MainActivity : AppCompatActivity() {
         val empty = homeApps.isEmpty()
         binding.tvEmptyHint.visibility = if (empty) View.VISIBLE else View.GONE
         binding.rvHomeApps.visibility  = if (empty) View.GONE    else View.VISIBLE
+
+        // Update tab colours
+        val activeColor   = android.graphics.Color.WHITE
+        val inactiveColor = android.graphics.Color.parseColor("#444444")
+        binding.tabPinned.setTextColor(
+            if (prefs.homeTab == "pinned") activeColor else inactiveColor)
+        binding.tabFrequent.setTextColor(
+            if (prefs.homeTab == "frequent") activeColor else inactiveColor)
+    }
+
+    private fun setupHomeTabs() {
+        binding.tabPinned.setOnClickListener {
+            prefs.homeTab = "pinned"
+            loadHomeApps()
+        }
+        binding.tabFrequent.setOnClickListener {
+            prefs.homeTab = "frequent"
+            loadHomeApps()
+        }
     }
 
     private fun launchApp(app: AppInfo) {
