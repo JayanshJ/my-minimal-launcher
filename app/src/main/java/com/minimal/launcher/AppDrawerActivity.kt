@@ -379,6 +379,14 @@ class AppDrawerActivity : AppCompatActivity() {
             showBlockedDialog(app)
             return
         }
+        if (prefs.isDelayed(app.packageName)) {
+            startActivity(Intent(this, AppOpenDelayActivity::class.java).apply {
+                putExtra(AppOpenDelayActivity.EXTRA_PKG,      app.packageName)
+                putExtra(AppOpenDelayActivity.EXTRA_ACTIVITY, app.activityName)
+                putExtra(AppOpenDelayActivity.EXTRA_LABEL,    app.label)
+            })
+            return
+        }
         doLaunchApp(app)
     }
 
@@ -419,18 +427,21 @@ class AppDrawerActivity : AppCompatActivity() {
     }
 
     private fun showAppOptions(app: AppInfo) {
-        val isOnHome = prefs.isPinned(app.packageName)
+        val isOnHome  = prefs.isPinned(app.packageName)
+        val hasDelay  = prefs.isDelayed(app.packageName)
         AlertDialog.Builder(this)
             .setTitle(app.label)
             .setItems(arrayOf(
                 if (isOnHome) "Remove from home screen" else "Add to home screen",
+                if (hasDelay) "Remove open delay" else "Add 5s open delay",
                 "Hide from list",
                 "App info"
             )) { _, which ->
                 when (which) {
-                    0 -> { prefs.togglePin(app.packageName); refreshList() }
-                    1 -> { prefs.hideApp(app.packageName); loadApps() }
-                    2 -> openAppInfo(app)
+                    0 -> { prefs.togglePin(app.packageName);    refreshList() }
+                    1 -> { prefs.toggleDelay(app.packageName);  refreshList() }
+                    2 -> { prefs.hideApp(app.packageName);      loadApps() }
+                    3 -> openAppInfo(app)
                 }
             }
             .show()

@@ -505,6 +505,29 @@ class MainActivity : AppCompatActivity() {
             else         -> "${minutes}m"
         }
         updateWidgetText()
+        updateScreenTimeBar(totalMs)
+    }
+
+    private fun updateScreenTimeBar(totalMs: Long) {
+        val bar = binding.screenTimeProgress
+        if (totalMs <= 0L) {
+            bar.visibility = android.view.View.GONE
+            return
+        }
+        val goalMs  = SCREEN_TIME_GOAL_MS
+        val pct     = ((totalMs.toFloat() / goalMs) * 100).toInt().coerceIn(0, 100)
+        val overGoal = totalMs > goalMs
+        bar.progressTintList = android.content.res.ColorStateList.valueOf(
+            if (overGoal) 0xFFFF6B6B.toInt() else 0xFFFFFFFF.toInt()
+        )
+        if (bar.visibility != android.view.View.VISIBLE) {
+            bar.progress = 0
+            bar.visibility = android.view.View.VISIBLE
+        }
+        val anim = android.animation.ObjectAnimator.ofInt(bar, "progress", bar.progress, pct)
+        anim.duration = 600
+        anim.interpolator = android.view.animation.DecelerateInterpolator()
+        anim.start()
     }
 
     // ─── Weather ──────────────────────────────────────────────────────────────
@@ -650,6 +673,14 @@ class MainActivity : AppCompatActivity() {
     private fun launchApp(app: AppInfo) {
         if (prefs.isBlocked(app.packageName)) {
             showBlockedDialog(app)
+            return
+        }
+        if (prefs.isDelayed(app.packageName)) {
+            startActivity(Intent(this, AppOpenDelayActivity::class.java).apply {
+                putExtra(AppOpenDelayActivity.EXTRA_PKG,      app.packageName)
+                putExtra(AppOpenDelayActivity.EXTRA_ACTIVITY, app.activityName)
+                putExtra(AppOpenDelayActivity.EXTRA_LABEL,    app.label)
+            })
             return
         }
         doLaunchApp(app)
@@ -1183,10 +1214,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val REQ_PERMISSIONS = 1001
-        private const val REQ_ROLE_HOME   = 1002
-        private const val FOCUS_MS      = 25 * 60 * 1000L
-        private const val BREAK_MS      =  5 * 60 * 1000L
-        private const val LONG_BREAK_MS = 15 * 60 * 1000L
+        private const val REQ_PERMISSIONS       = 1001
+        private const val REQ_ROLE_HOME         = 1002
+        private const val FOCUS_MS              = 25 * 60 * 1000L
+        private const val BREAK_MS              =  5 * 60 * 1000L
+        private const val LONG_BREAK_MS         = 15 * 60 * 1000L
+        private const val SCREEN_TIME_GOAL_MS   =  4 * 60 * 60 * 1000L  // 4 hours
     }
 }

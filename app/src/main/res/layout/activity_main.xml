@@ -75,6 +75,21 @@
             android:textColor="@color/gray_secondary"
             android:textSize="@dimen/widget_text_size" />
 
+        <!-- ───────────────── Screen time bar ───────────────── -->
+        <ProgressBar
+            android:id="@+id/screen_time_progress"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginStart="@dimen/margin_h"
+            android:layout_marginEnd="@dimen/margin_h"
+            android:layout_marginTop="14dp"
+            android:max="100"
+            android:progress="0"
+            android:progressBackgroundTint="#1A1A1A"
+            android:progressTint="#FFFFFF"
+            android:visibility="gone" />
+
         <!-- ───────────────── Pomodoro timer ───────────────── -->
         <TextView
             android:id="@+id/tv_timer_time"

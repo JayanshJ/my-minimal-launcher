@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -15,6 +16,8 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.minimal.launcher.databinding.ActivitySettingsBinding
@@ -29,6 +32,18 @@ class SettingsActivity : AppCompatActivity() {
 
     // All installed apps (for gesture picker and hide picker)
     private var installedApps: List<AppInfo> = emptyList()
+
+    // File picker for backup import
+    private val importLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri == null) return@registerForActivityResult
+        val ok = BackupManager.import(this, prefs, uri)
+        Toast.makeText(this,
+            if (ok) "Settings restored" else "Restore failed — invalid file",
+            Toast.LENGTH_SHORT).show()
+        if (ok) applyAll()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -170,6 +185,8 @@ class SettingsActivity : AppCompatActivity() {
         rebuildBlockedAppsUI()
         // Hidden apps list
         rebuildHiddenAppsUI()
+        // Delayed apps list
+        rebuildDelayedAppsUI()
 
         // Dumb phone
         if (AppLockManager.isDeviceOwner(this)) {
@@ -312,6 +329,22 @@ class SettingsActivity : AppCompatActivity() {
 
         // Hide app
         binding.btnHideApp.setOnClickListener { pickAppToHide() }
+
+        // Delay app
+        binding.btnDelayApp.setOnClickListener { pickAppToDelay() }
+
+        // Backup export
+        binding.btnBackupExport.setOnClickListener {
+            val ok = BackupManager.export(this, prefs)
+            Toast.makeText(this,
+                if (ok) "Backup saved to Downloads" else "Export failed",
+                Toast.LENGTH_SHORT).show()
+        }
+
+        // Backup import
+        binding.btnBackupImport.setOnClickListener {
+            importLauncher.launch("*/*")
+        }
 
         // Dumb phone — enable lock mode
         binding.optDumbOn.setOnClickListener {
@@ -650,6 +683,48 @@ class SettingsActivity : AppCompatActivity() {
                 prefs.unhideApp(pkg)
                 applyAll()
             }
+        }
+    }
+
+    // ── Open-delay apps ───────────────────────────────────────────────────────
+
+    private fun pickAppToDelay() {
+        val notDelayed = installedApps.filter { !prefs.isDelayed(it.packageName) }
+        if (notDelayed.isEmpty()) return
+        AlertDialog.Builder(this)
+            .setTitle("add 5s delay to app")
+            .setItems(notDelayed.map { it.label }.toTypedArray()) { _, which ->
+                prefs.toggleDelay(notDelayed[which].packageName)
+                applyAll()
+            }
+            .show()
+    }
+
+    private fun rebuildDelayedAppsUI() {
+        binding.llDelayedApps.removeAllViews()
+        val delayed = prefs.getDelayedPackages()
+        if (delayed.isEmpty()) {
+            binding.llDelayedApps.addView(makeInfoText("none"))
+            return
+        }
+        delayed.forEach { pkg ->
+            val label = installedApps.firstOrNull { it.packageName == pkg }?.label ?: pkg
+            binding.llDelayedApps.addView(makeDelayedAppRow(label, pkg))
+        }
+    }
+
+    private fun makeDelayedAppRow(label: String, pkg: String): View {
+        val lp = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ).apply { topMargin = (8 * resources.displayMetrics.density).toInt() }
+        return TextView(this).apply {
+            layoutParams = lp
+            text = "$label  ↩ remove"
+            textSize = 15f
+            setTextColor(Color.parseColor("#AAAAAA"))
+            typeface = android.graphics.Typeface.create("sans-serif-light", android.graphics.Typeface.NORMAL)
+            setOnClickListener { prefs.toggleDelay(pkg); applyAll() }
         }
     }
 

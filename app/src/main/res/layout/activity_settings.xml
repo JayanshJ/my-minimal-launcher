@@ -336,6 +336,65 @@
             </LinearLayout>
         </LinearLayout>
 
+        <!-- ══ OPEN DELAY ══ -->
+        <TextView style="@style/SectionHeader" android:layout_marginTop="28dp" android:text="open delay" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="sans-serif-light"
+            android:letterSpacing="0.01"
+            android:text="apps with a delay show a 5-second countdown before opening."
+            android:textColor="#444444"
+            android:textSize="11sp" />
+
+        <LinearLayout style="@style/SettingRow" android:layout_marginTop="8dp">
+            <TextView style="@style/RowLabel" android:text="delayed" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/ll_delayed_apps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:id="@+id/btn_delay_app"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="sans-serif-light"
+                    android:text="add app..."
+                    android:textColor="@color/gray_secondary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ══ BACKUP ══ -->
+        <TextView style="@style/SectionHeader" android:layout_marginTop="28dp" android:text="backup" />
+
+        <LinearLayout style="@style/SettingRow" android:layout_marginTop="8dp">
+            <TextView style="@style/RowLabel" android:text="settings" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView
+                    android:id="@+id/btn_backup_export"
+                    style="@style/Opt"
+                    android:text="export" />
+                <TextView style="@style/Dot" />
+                <TextView
+                    android:id="@+id/btn_backup_import"
+                    style="@style/Opt"
+                    android:text="import" />
+            </LinearLayout>
+        </LinearLayout>
+
         <!-- ══ DUMB PHONE ══ -->
         <TextView style="@style/SectionHeader" android:layout_marginTop="28dp" android:text="dumb phone" />
 

@@ -318,6 +318,26 @@ class PrefsManager(context: Context) {
         get() = prefs.getBoolean(KEY_ONBOARDING, false)
         set(value) { prefs.edit().putBoolean(KEY_ONBOARDING, value).apply() }
 
+    // ── App open delay ────────────────────────────────────────────────────────
+
+    fun getDelayedPackages(): Set<String> =
+        prefs.getStringSet(KEY_DELAYED, emptySet())?.toSet() ?: emptySet()
+
+    fun isDelayed(packageName: String): Boolean = packageName in getDelayedPackages()
+
+    fun toggleDelay(packageName: String) {
+        val s = getDelayedPackages().toMutableSet()
+        if (packageName in s) s.remove(packageName) else s.add(packageName)
+        prefs.edit().putStringSet(KEY_DELAYED, s).apply()
+    }
+
+    // ── Batch setters (for backup restore) ───────────────────────────────────
+
+    fun setPinnedPackages(packages: Set<String>)  { prefs.edit().putStringSet(KEY_PINNED,   packages).apply() }
+    fun setHiddenPackages(packages: Set<String>)  { prefs.edit().putStringSet(KEY_HIDDEN,   packages).apply() }
+    fun setBlockedPackages(packages: Set<String>) { prefs.edit().putStringSet(KEY_BLOCKED,  packages).apply() }
+    fun setDelayedPackages(packages: Set<String>) { prefs.edit().putStringSet(KEY_DELAYED,  packages).apply() }
+
     // ── Launch counts ─────────────────────────────────────────────────────────
 
     fun recordLaunch(packageName: String) {
@@ -367,6 +387,7 @@ class PrefsManager(context: Context) {
         private const val KEY_SHOW_SUNRISE    = "show_sunrise_sunset"
         private const val KEY_HOME_ALIGNMENT  = "home_alignment"
         private const val KEY_HOME_TAB           = "home_tab"
+        private const val KEY_DELAYED           = "delayed_apps"
         private const val KEY_DUMB_PHONE        = "dumb_phone_enabled"
         private const val KEY_DUMB_PIN          = "dumb_phone_pin"
         private const val KEY_ALLOWED           = "allowed_apps"
