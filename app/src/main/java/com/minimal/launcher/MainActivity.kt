@@ -106,7 +106,6 @@ class MainActivity : AppCompatActivity() {
 
     // Animation state
     private var isFirstResume    = true
-    private var lastClockMinute  = ""
     private var lastWidgetText   = ""
     private var lastGreetingHour = -1
     private var hintAnimator: ObjectAnimator? = null
@@ -328,14 +327,11 @@ class MainActivity : AppCompatActivity() {
     private fun updateClock() {
         updateGreeting()
         updateWorldClock()
-        val now    = Date()
-        val minute = SimpleDateFormat("HH:mm", Locale.getDefault()).format(now)
-        val minuteChanged = minute != lastClockMinute
-        if (minuteChanged) lastClockMinute = minute
+        val now = Date()
 
-        fun applyClockText() {
-            if (prefs.is24Hour) {
-                binding.tvClock.text = clockFmt.format(now)
+        fun buildClockText(): CharSequence {
+            return if (prefs.is24Hour) {
+                clockFmt.format(now)
             } else {
                 val timeStr = clockFmt.format(now)
                 val ampm    = ampmFmt.format(now).lowercase()
@@ -343,18 +339,37 @@ class MainActivity : AppCompatActivity() {
                 val start   = timeStr.length + 2
                 span.setSpan(RelativeSizeSpan(0.28f), start, span.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 span.setSpan(ForegroundColorSpan(Color.parseColor("#AAAAAA")), start, span.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                binding.tvClock.text = span
+                span
             }
         }
 
-        if (minuteChanged && binding.tvClock.alpha == 1f && lastClockMinute.isNotEmpty()) {
-            binding.tvClock.animate().alpha(0.25f).setDuration(90).withEndAction {
-                applyClockText()
-                binding.tvClock.animate().alpha(1f).setDuration(160).start()
-            }.start()
+        val tv = binding.tvClock
+        val density = resources.displayMetrics.density
+        val slideDistance = 10f * density   // px — digits roll upward by this amount
+
+        if (tv.text.isEmpty()) {
+            // First render — no animation, just show immediately
+            tv.text = buildClockText()
         } else {
-            applyClockText()
+            // Smooth every-second transition: slide up + fade out → swap → slide up from below + fade in
+            tv.animate().cancel()
+            tv.animate()
+                .alpha(0f)
+                .translationY(-slideDistance)
+                .setDuration(90)
+                .setInterpolator(android.view.animation.AccelerateInterpolator())
+                .withEndAction {
+                    tv.text = buildClockText()
+                    tv.translationY = slideDistance   // reset below, then rise up
+                    tv.animate()
+                        .alpha(1f)
+                        .translationY(0f)
+                        .setDuration(200)
+                        .setInterpolator(android.view.animation.DecelerateInterpolator())
+                        .start()
+                }.start()
         }
+
         binding.tvDate.text = dateFmt.format(now)
     }
 
