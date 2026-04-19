@@ -11,6 +11,7 @@ import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.EditText
@@ -47,8 +48,7 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.statusBarColor     = 0xFF000000.toInt()
-        window.navigationBarColor = 0xFF000000.toInt()
+        enableEdgeToEdge()
 
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)

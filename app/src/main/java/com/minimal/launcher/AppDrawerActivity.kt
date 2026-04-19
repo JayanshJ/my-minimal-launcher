@@ -23,6 +23,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -50,8 +51,7 @@ class AppDrawerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.statusBarColor     = 0xFF000000.toInt()
-        window.navigationBarColor = 0xFF000000.toInt()
+        enableEdgeToEdge()
 
         binding = ActivityAppDrawerBinding.inflate(layoutInflater)
         setContentView(binding.root)

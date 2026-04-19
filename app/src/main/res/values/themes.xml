@@ -16,9 +16,7 @@
         <item name="android:windowIsTranslucent">false</item>
         <item name="android:windowAnimationStyle">@style/MinimalWindowAnimation</item>
 
-        <!-- Status bar / nav bar -->
-        <item name="android:statusBarColor">@color/black</item>
-        <item name="android:navigationBarColor">@color/black</item>
+        <!-- Edge-to-edge: bars are transparent, window background shows through -->
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
 

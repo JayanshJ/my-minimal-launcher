@@ -8,6 +8,7 @@ import android.os.Looper
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.minimal.launcher.databinding.ActivityAppOpenDelayBinding
 
@@ -41,8 +42,7 @@ class AppOpenDelayActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.statusBarColor     = 0xFF000000.toInt()
-        window.navigationBarColor = 0xFF000000.toInt()
+        enableEdgeToEdge()
 
         binding = ActivityAppOpenDelayBinding.inflate(layoutInflater)
         setContentView(binding.root)
