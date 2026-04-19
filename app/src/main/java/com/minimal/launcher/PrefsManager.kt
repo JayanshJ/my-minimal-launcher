@@ -259,59 +259,6 @@ class PrefsManager(context: Context) {
         get() = prefs.getString(KEY_HOME_TAB, "pinned") ?: "pinned"
         set(value) { prefs.edit().putString(KEY_HOME_TAB, value).apply() }
 
-    // ── Dumb-phone / focus lock ───────────────────────────────────────────────
-
-    /** Whether the OS-level app whitelist is currently active. */
-    var dumbPhoneEnabled: Boolean
-        get() = prefs.getBoolean(KEY_DUMB_PHONE, false)
-        set(value) { prefs.edit().putBoolean(KEY_DUMB_PHONE, value).apply() }
-
-    /** PIN required to modify the whitelist or disable dumb-phone mode. Empty = no PIN. */
-    var dumbPhonePin: String
-        get() = prefs.getString(KEY_DUMB_PIN, "") ?: ""
-        set(value) { prefs.edit().putString(KEY_DUMB_PIN, value).apply() }
-
-    /** Epoch ms when the user requested disable. -1 = no pending request. */
-    var disableRequestedAt: Long
-        get() = prefs.getLong(KEY_DISABLE_REQUESTED, -1L)
-        set(value) { prefs.edit().putLong(KEY_DISABLE_REQUESTED, value).apply() }
-
-    fun isDisableCountdownActive(): Boolean = disableRequestedAt > 0
-
-    fun isDisableCountdownExpired(): Boolean {
-        val t = disableRequestedAt
-        return t > 0 && System.currentTimeMillis() - t >= DISABLE_DELAY_MS
-    }
-
-    fun isInGracePeriod(): Boolean {
-        val t = disableRequestedAt
-        return t > 0 && System.currentTimeMillis() - t < GRACE_PERIOD_MS
-    }
-
-    fun disableCountdownRemainingMs(): Long {
-        val t = disableRequestedAt
-        if (t <= 0) return 0L
-        return maxOf(0L, t + DISABLE_DELAY_MS - System.currentTimeMillis())
-    }
-
-    /** Set of package names the user has explicitly allowed. */
-    fun getAllowedPackages(): Set<String> =
-        prefs.getStringSet(KEY_ALLOWED, DEFAULT_ALLOWED)?.toSet() ?: DEFAULT_ALLOWED
-
-    fun setAllowedPackages(packages: Set<String>) {
-        prefs.edit().putStringSet(KEY_ALLOWED, packages).apply()
-    }
-
-    fun allowApp(packageName: String) {
-        val s = getAllowedPackages().toMutableSet().also { it.add(packageName) }
-        prefs.edit().putStringSet(KEY_ALLOWED, s).apply()
-    }
-
-    fun disallowApp(packageName: String) {
-        val s = getAllowedPackages().toMutableSet().also { it.remove(packageName) }
-        prefs.edit().putStringSet(KEY_ALLOWED, s).apply()
-    }
-
     // ── Onboarding ────────────────────────────────────────────────────────────
 
     var hasSeenOnboarding: Boolean
@@ -388,37 +335,5 @@ class PrefsManager(context: Context) {
         private const val KEY_HOME_ALIGNMENT  = "home_alignment"
         private const val KEY_HOME_TAB           = "home_tab"
         private const val KEY_DELAYED           = "delayed_apps"
-        private const val KEY_DUMB_PHONE        = "dumb_phone_enabled"
-        private const val KEY_DUMB_PIN          = "dumb_phone_pin"
-        private const val KEY_ALLOWED           = "allowed_apps"
-        private const val KEY_DISABLE_REQUESTED = "dumb_disable_requested_at"
-
-        const val DISABLE_DELAY_MS = 24 * 60 * 60 * 1000L   // 24 hours
-        const val GRACE_PERIOD_MS  =  5 * 60 * 1000L        // 5 minutes to cancel
-
-        val DEFAULT_ALLOWED: Set<String> = setOf(
-            "com.minimal.launcher",
-            // Phone / dialer (covers stock + Google)
-            "com.android.dialer",
-            "com.google.android.dialer",
-            "com.android.phone",
-            // SMS / Messages
-            "com.android.mms",
-            "com.google.android.apps.messaging",
-            "com.samsung.android.messaging",
-            // Camera
-            "com.android.camera2",
-            "com.google.android.GoogleCamera",
-            // Settings
-            "com.android.settings",
-            // Clock / alarm
-            "com.android.deskclock",
-            "com.google.android.deskclock",
-            // Contacts
-            "com.android.contacts",
-            "com.google.android.contacts",
-            // Maps
-            "com.google.android.apps.maps"
-        )
     }
 }
