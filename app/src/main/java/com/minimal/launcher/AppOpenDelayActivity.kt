@@ -113,6 +113,6 @@ class AppOpenDelayActivity : AppCompatActivity() {
         const val EXTRA_PKG      = "delay_pkg"
         const val EXTRA_ACTIVITY = "delay_activity"
         const val EXTRA_LABEL    = "delay_label"
-        const val DELAY_SECS     = 5
+        const val DELAY_SECS     = 15
     }
 }
