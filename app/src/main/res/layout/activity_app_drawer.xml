@@ -103,57 +103,5 @@
 
     </FrameLayout>
 
-    <!-- ───────────────── Batch-select action bar ───────────────── -->
-    <LinearLayout
-        android:id="@+id/bar_selection"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingStart="@dimen/margin_h"
-        android:paddingEnd="@dimen/margin_h"
-        android:paddingTop="14dp"
-        android:paddingBottom="28dp"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/tv_selection_count"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:fontFamily="sans-serif-light"
-            android:letterSpacing="0.02"
-            android:textColor="@color/gray_secondary"
-            android:textSize="13sp" />
-
-        <TextView
-            android:id="@+id/btn_uninstall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="sans-serif-light"
-            android:paddingStart="24dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:text="uninstall"
-            android:textColor="@color/white"
-            android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/btn_cancel_selection"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="sans-serif-light"
-            android:paddingStart="20dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:text="cancel"
-            android:textColor="@color/gray_secondary"
-            android:textSize="15sp" />
-
-    </LinearLayout>
 
 </LinearLayout>

@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.RecyclerView
 
 class AppListAdapter(
     private val onAppClick: (AppInfo) -> Unit,
-    private val onAppLongClick: (AppInfo) -> Boolean
+    private val onAppLongClick: (AppInfo) -> Boolean,
+    private val onSettingsClick: ((String) -> Unit)? = null,
+    private val onContactClick: ((String) -> Unit)? = null
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     // ── Item model ────────────────────────────────────────────────────────────
@@ -22,16 +24,16 @@ class AppListAdapter(
     sealed class Item {
         data class Header(val title: String) : Item()
         data class App(val info: AppInfo) : Item()
+        data class SettingsResult(val label: String, val action: String) : Item()
+        data class Contact(val name: String, val number: String) : Item()
     }
 
     private companion object {
-        const val TYPE_HEADER   = 0
-        const val TYPE_APP_LIST = 1
-        const val TYPE_APP_GRID = 2
-
-        val COLOR_NORMAL   = Color.WHITE
-        val COLOR_SELECTED = Color.WHITE
-        val COLOR_DIM      = Color.parseColor("#404040")
+        const val TYPE_HEADER         = 0
+        const val TYPE_APP_LIST       = 1
+        const val TYPE_APP_GRID       = 2
+        const val TYPE_SETTINGS       = 3
+        const val TYPE_CONTACT        = 4
     }
 
     // ── Display properties ────────────────────────────────────────────────────
@@ -40,33 +42,6 @@ class AppListAdapter(
     var typeface: Typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
     var gridMode: Boolean = false
     var textGravity: Int = android.view.Gravity.START
-
-    // ── Selection state ───────────────────────────────────────────────────────
-
-    var selectionMode: Boolean = false
-        private set
-
-    private val _selected = mutableSetOf<String>()
-    val selectedPackages: Set<String> get() = _selected
-
-    fun enterSelectionMode(packageName: String) {
-        selectionMode = true
-        _selected.clear()
-        _selected.add(packageName)
-        notifyDataSetChanged()
-    }
-
-    fun toggleSelection(packageName: String) {
-        if (_selected.contains(packageName)) _selected.remove(packageName)
-        else _selected.add(packageName)
-        notifyDataSetChanged()
-    }
-
-    fun clearSelection() {
-        selectionMode = false
-        _selected.clear()
-        notifyDataSetChanged()
-    }
 
     // ── Data ──────────────────────────────────────────────────────────────────
 
@@ -79,8 +54,10 @@ class AppListAdapter(
             override fun areItemsTheSame(o: Int, n: Int): Boolean {
                 val old = items[o]; val new = newItems[n]
                 return when {
-                    old is Item.Header && new is Item.Header -> old.title == new.title
-                    old is Item.App    && new is Item.App    -> old.info.packageName == new.info.packageName
+                    old is Item.Header         && new is Item.Header         -> old.title == new.title
+                    old is Item.App            && new is Item.App            -> old.info.packageName == new.info.packageName
+                    old is Item.SettingsResult && new is Item.SettingsResult -> old.action == new.action
+                    old is Item.Contact        && new is Item.Contact        -> old.name == new.name
                     else -> false
                 }
             }
@@ -90,8 +67,10 @@ class AppListAdapter(
         diff.dispatchUpdatesTo(this)
     }
 
-    fun getSpanSize(position: Int): Int =
-        if (items.getOrNull(position) is Item.Header) 2 else 1
+    fun getSpanSize(position: Int): Int = when (items.getOrNull(position)) {
+        is Item.Header, is Item.SettingsResult, is Item.Contact -> 2
+        else -> 1
+    }
 
     // ── ViewHolders ───────────────────────────────────────────────────────────
 
@@ -103,13 +82,20 @@ class AppListAdapter(
         val label: TextView = view.findViewById(R.id.tv_app_label)
     }
 
+    class SearchResultViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val label: TextView = view.findViewById(R.id.tv_result_label)
+        val hint: TextView  = view.findViewById(R.id.tv_result_hint)
+    }
+
     // ── RecyclerView overrides ────────────────────────────────────────────────
 
     override fun getItemCount() = items.size
 
     override fun getItemViewType(position: Int) = when (items[position]) {
-        is Item.Header -> TYPE_HEADER
-        is Item.App    -> if (gridMode) TYPE_APP_GRID else TYPE_APP_LIST
+        is Item.Header         -> TYPE_HEADER
+        is Item.App            -> if (gridMode) TYPE_APP_GRID else TYPE_APP_LIST
+        is Item.SettingsResult -> TYPE_SETTINGS
+        is Item.Contact        -> TYPE_CONTACT
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -117,6 +103,8 @@ class AppListAdapter(
         return when (viewType) {
             TYPE_HEADER   -> HeaderViewHolder(inf.inflate(R.layout.item_section_header, parent, false))
             TYPE_APP_GRID -> AppViewHolder(inf.inflate(R.layout.item_app_grid, parent, false))
+            TYPE_SETTINGS,
+            TYPE_CONTACT  -> SearchResultViewHolder(inf.inflate(R.layout.item_search_result, parent, false))
             else          -> AppViewHolder(inf.inflate(R.layout.item_app, parent, false))
         }
     }
@@ -124,21 +112,13 @@ class AppListAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = items[position]) {
             is Item.Header -> (holder as HeaderViewHolder).title.text = item.title
-            is Item.App    -> with(holder as AppViewHolder) {
-                val isSelected = _selected.contains(item.info.packageName)
 
+            is Item.App -> with(holder as AppViewHolder) {
                 label.text     = item.info.label
                 label.textSize = fontSizeSp
                 label.typeface = typeface
                 label.gravity  = textGravity
-                label.setTextColor(when {
-                    !selectionMode -> COLOR_NORMAL
-                    isSelected     -> COLOR_SELECTED
-                    else           -> COLOR_DIM
-                })
-                itemView.setBackgroundColor(
-                    if (isSelected) Color.parseColor("#0F0F0F") else Color.TRANSPARENT
-                )
+                label.setTextColor(Color.WHITE)
 
                 itemView.setOnClickListener     { onAppClick(item.info) }
                 itemView.setOnLongClickListener { onAppLongClick(item.info) }
@@ -153,6 +133,18 @@ class AppListAdapter(
                     }
                     false
                 }
+            }
+
+            is Item.SettingsResult -> with(holder as SearchResultViewHolder) {
+                label.text = item.label
+                hint.text  = "settings →"
+                itemView.setOnClickListener { onSettingsClick?.invoke(item.action) }
+            }
+
+            is Item.Contact -> with(holder as SearchResultViewHolder) {
+                label.text = item.name
+                hint.text  = "call →"
+                itemView.setOnClickListener { onContactClick?.invoke(item.number) }
             }
         }
     }

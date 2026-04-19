@@ -12,7 +12,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
-import android.database.Cursor
 import android.graphics.Color
 import android.location.LocationManager
 import android.net.Uri
@@ -23,7 +22,6 @@ import android.os.Handler
 import android.os.Looper
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.provider.CalendarContract
 import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -33,7 +31,6 @@ import android.view.GestureDetector
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
-import android.view.WindowManager
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
@@ -45,6 +42,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updateLayoutParams
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -81,11 +79,6 @@ class MainActivity : AppCompatActivity() {
     private val dateFmt  = SimpleDateFormat("EEEE, d MMMM", Locale.getDefault())
     private val ampmFmt  = SimpleDateFormat("a", Locale.getDefault())
 
-    // Calendar widget
-    private val calendarHandler = Handler(Looper.getMainLooper())
-    private val calendarRefreshRunnable = Runnable { loadCalendarEvents() }
-    private var calendarText: String = ""
-
     // Battery
     private var batteryText: String = ""
 
@@ -113,7 +106,6 @@ class MainActivity : AppCompatActivity() {
 
     // Animation state
     private var isFirstResume    = true
-    private var lastClockMinute  = ""
     private var lastWidgetText   = ""
     private var lastGreetingHour = -1
     private var hintAnimator: ObjectAnimator? = null
@@ -126,9 +118,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.statusBarColor     = 0xFF000000.toInt()
-        window.navigationBarColor = 0xFF000000.toInt()
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        enableEdgeToEdge()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -281,7 +271,6 @@ class MainActivity : AppCompatActivity() {
         updateClock()
         refreshBattery()
         refreshScreenTime()
-        loadCalendarEvents()
         refreshWeather()
         updateDaysUntil()
         if (prefs.hasLastLocation()) {
@@ -305,7 +294,6 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         clockHandler.removeCallbacksAndMessages(null)
-        calendarHandler.removeCallbacksAndMessages(null)
         weatherHandler.removeCallbacksAndMessages(null)
         timerHandler.removeCallbacksAndMessages(null)
         unregisterReceiver(packageReceiver)
@@ -337,14 +325,11 @@ class MainActivity : AppCompatActivity() {
     private fun updateClock() {
         updateGreeting()
         updateWorldClock()
-        val now    = Date()
-        val minute = SimpleDateFormat("HH:mm", Locale.getDefault()).format(now)
-        val minuteChanged = minute != lastClockMinute
-        if (minuteChanged) lastClockMinute = minute
+        val now = Date()
 
-        fun applyClockText() {
-            if (prefs.is24Hour) {
-                binding.tvClock.text = clockFmt.format(now)
+        fun buildClockText(): CharSequence {
+            return if (prefs.is24Hour) {
+                clockFmt.format(now)
             } else {
                 val timeStr = clockFmt.format(now)
                 val ampm    = ampmFmt.format(now).lowercase()
@@ -352,18 +337,37 @@ class MainActivity : AppCompatActivity() {
                 val start   = timeStr.length + 2
                 span.setSpan(RelativeSizeSpan(0.28f), start, span.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 span.setSpan(ForegroundColorSpan(Color.parseColor("#AAAAAA")), start, span.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                binding.tvClock.text = span
+                span
             }
         }
 
-        if (minuteChanged && binding.tvClock.alpha == 1f && lastClockMinute.isNotEmpty()) {
-            binding.tvClock.animate().alpha(0.25f).setDuration(90).withEndAction {
-                applyClockText()
-                binding.tvClock.animate().alpha(1f).setDuration(160).start()
-            }.start()
+        val tv = binding.tvClock
+        val density = resources.displayMetrics.density
+        val slideDistance = 10f * density   // px — digits roll upward by this amount
+
+        if (tv.text.isEmpty()) {
+            // First render — no animation, just show immediately
+            tv.text = buildClockText()
         } else {
-            applyClockText()
+            // Smooth every-second transition: slide up + fade out → swap → slide up from below + fade in
+            tv.animate().cancel()
+            tv.animate()
+                .alpha(0f)
+                .translationY(-slideDistance)
+                .setDuration(90)
+                .setInterpolator(android.view.animation.AccelerateInterpolator())
+                .withEndAction {
+                    tv.text = buildClockText()
+                    tv.translationY = slideDistance   // reset below, then rise up
+                    tv.animate()
+                        .alpha(1f)
+                        .translationY(0f)
+                        .setDuration(200)
+                        .setInterpolator(android.view.animation.DecelerateInterpolator())
+                        .start()
+                }.start()
         }
+
         binding.tvDate.text = dateFmt.format(now)
     }
 
@@ -418,7 +422,7 @@ class MainActivity : AppCompatActivity() {
         updateWidgetText()
     }
 
-    // ─── Widget (weather + calendar combined) ─────────────────────────────────
+    // ─── Widget ───────────────────────────────────────────────────────────────
 
     private fun updateWidgetText() {
         val parts = mutableListOf<String>()
@@ -430,7 +434,7 @@ class MainActivity : AppCompatActivity() {
         if (screenTimeText.isNotEmpty()) parts.add(screenTimeText)
         if (worldClockText.isNotEmpty()) parts.add(worldClockText)
         if (daysUntilText.isNotEmpty())  parts.add(daysUntilText)
-        if (calendarText.isNotEmpty())   parts.add(calendarText)
+
         val newText = parts.joinToString("\n")
         if (newText == lastWidgetText) return
         lastWidgetText = newText
@@ -507,16 +511,35 @@ class MainActivity : AppCompatActivity() {
             else         -> "${minutes}m"
         }
         updateWidgetText()
+        updateScreenTimeBar(totalMs)
+    }
+
+    private fun updateScreenTimeBar(totalMs: Long) {
+        val bar = binding.screenTimeProgress
+        if (totalMs <= 0L) {
+            bar.visibility = android.view.View.GONE
+            return
+        }
+        val goalMs  = SCREEN_TIME_GOAL_MS
+        val pct     = ((totalMs.toFloat() / goalMs) * 100).toInt().coerceIn(0, 100)
+        val overGoal = totalMs > goalMs
+        bar.progressTintList = android.content.res.ColorStateList.valueOf(
+            if (overGoal) 0xFFFF6B6B.toInt() else 0xFFFFFFFF.toInt()
+        )
+        if (bar.visibility != android.view.View.VISIBLE) {
+            bar.progress = 0
+            bar.visibility = android.view.View.VISIBLE
+        }
+        val anim = android.animation.ObjectAnimator.ofInt(bar, "progress", bar.progress, pct)
+        anim.duration = 600
+        anim.interpolator = android.view.animation.DecelerateInterpolator()
+        anim.start()
     }
 
     // ─── Weather ──────────────────────────────────────────────────────────────
 
     private fun requestRuntimePermissions() {
         val needed = buildList {
-            if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.READ_CALENDAR)
-                    != PackageManager.PERMISSION_GRANTED) add(Manifest.permission.READ_CALENDAR)
-            else loadCalendarEvents()
-
             if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.ACCESS_COARSE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) add(Manifest.permission.ACCESS_COARSE_LOCATION)
             else refreshWeather()
@@ -553,8 +576,6 @@ class MainActivity : AppCompatActivity() {
         weatherHandler.postDelayed(weatherRefreshRunnable, 15 * 60 * 1_000L)
     }
 
-    // ─── Calendar ─────────────────────────────────────────────────────────────
-
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
@@ -563,7 +584,6 @@ class MainActivity : AppCompatActivity() {
             permissions.forEachIndexed { i, perm ->
                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                     when (perm) {
-                        Manifest.permission.READ_CALENDAR          -> loadCalendarEvents()
                         Manifest.permission.ACCESS_COARSE_LOCATION -> refreshWeather()
                     }
                 }
@@ -578,54 +598,6 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == REQ_ROLE_HOME) { /* role result handled */ }
     }
 
-    private fun loadCalendarEvents() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR)
-                != PackageManager.PERMISSION_GRANTED) return
-
-        val now = System.currentTimeMillis()
-        val end = now + 24 * 60 * 60 * 1_000L
-        val timeFmt = SimpleDateFormat("HH:mm", Locale.getDefault())
-
-        val projection = arrayOf(
-            CalendarContract.Events.TITLE,
-            CalendarContract.Events.DTSTART,
-            CalendarContract.Events.ALL_DAY
-        )
-        val selection =
-            "${CalendarContract.Events.DTSTART} >= ? AND " +
-            "${CalendarContract.Events.DTSTART} <= ? AND " +
-            "${CalendarContract.Events.DELETED} = 0"
-
-        var cursor: Cursor? = null
-        try {
-            cursor = contentResolver.query(
-                CalendarContract.Events.CONTENT_URI, projection, selection,
-                arrayOf(now.toString(), end.toString()),
-                "${CalendarContract.Events.DTSTART} ASC LIMIT 3"
-            )
-            val events = mutableListOf<String>()
-            cursor?.let {
-                val ti = it.getColumnIndex(CalendarContract.Events.TITLE)
-                val si = it.getColumnIndex(CalendarContract.Events.DTSTART)
-                val ai = it.getColumnIndex(CalendarContract.Events.ALL_DAY)
-                while (it.moveToNext()) {
-                    val title = it.getString(ti) ?: continue
-                    events.add(
-                        if (it.getInt(ai) == 1) title
-                        else "${timeFmt.format(Date(it.getLong(si)))}  $title"
-                    )
-                }
-            }
-            calendarText = events.joinToString("\n")
-        } catch (_: Exception) {
-            calendarText = ""
-        } finally {
-            cursor?.close()
-        }
-        updateWidgetText()
-        calendarHandler.removeCallbacks(calendarRefreshRunnable)
-        calendarHandler.postDelayed(calendarRefreshRunnable, 5 * 60 * 1_000L)
-    }
 
 
     // ─── Home app list ────────────────────────────────────────────────────────
@@ -667,10 +639,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadHomeApps() {
-        val pinned = prefs.getPinnedPackages()
-        val homeApps = allInstalledApps
-            .filter { it.packageName in pinned }
-            .sortedBy { it.label.lowercase() }
+        val homeApps = if (prefs.homeTab == "frequent") {
+            prefs.getFrequent(allInstalledApps, limit = 8)
+        } else {
+            val pinned = prefs.getPinnedPackages()
+            allInstalledApps
+                .filter { it.packageName in pinned }
+                .sortedBy { it.label.lowercase() }
+        }
 
         adapter.fontSizeSp = prefs.fontSizeSp()
         adapter.submitList(homeApps.map { AppListAdapter.Item.App(it) })
@@ -683,6 +659,14 @@ class MainActivity : AppCompatActivity() {
     private fun launchApp(app: AppInfo) {
         if (prefs.isBlocked(app.packageName)) {
             showBlockedDialog(app)
+            return
+        }
+        if (prefs.isDelayed(app.packageName)) {
+            startActivity(Intent(this, AppOpenDelayActivity::class.java).apply {
+                putExtra(AppOpenDelayActivity.EXTRA_PKG,      app.packageName)
+                putExtra(AppOpenDelayActivity.EXTRA_ACTIVITY, app.activityName)
+                putExtra(AppOpenDelayActivity.EXTRA_LABEL,    app.label)
+            })
             return
         }
         doLaunchApp(app)
@@ -1023,7 +1007,7 @@ class MainActivity : AppCompatActivity() {
             TourStep(
                 { binding.tvWidget },
                 "info bar.",
-                "weather, battery, screen time, sunrise & sunset,\nworld clock, countdown and upcoming calendar events.\nall configurable in settings."
+                "weather, battery, screen time, sunrise & sunset,\nworld clock and countdown.\nall configurable in settings."
             ),
             TourStep(
                 { binding.tvTimerTime },
@@ -1216,10 +1200,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val REQ_PERMISSIONS = 1001
-        private const val REQ_ROLE_HOME   = 1002
-        private const val FOCUS_MS      = 25 * 60 * 1000L
-        private const val BREAK_MS      =  5 * 60 * 1000L
-        private const val LONG_BREAK_MS = 15 * 60 * 1000L
+        private const val REQ_PERMISSIONS       = 1001
+        private const val REQ_ROLE_HOME         = 1002
+        private const val FOCUS_MS              = 25 * 60 * 1000L
+        private const val BREAK_MS              =  5 * 60 * 1000L
+        private const val LONG_BREAK_MS         = 15 * 60 * 1000L
+        private const val SCREEN_TIME_GOAL_MS   =  4 * 60 * 60 * 1000L  // 4 hours
     }
 }

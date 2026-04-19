@@ -6,9 +6,6 @@
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
 
-    <!-- Calendar events widget -->
-    <uses-permission android:name="android.permission.READ_CALENDAR" />
-
     <!-- Weather fetch -->
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -23,6 +20,9 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Universal search — contact lookup -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:name=".MinimalLauncherApp"
@@ -73,6 +73,14 @@
             android:name=".OnboardingActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
+        <!-- ── App open delay countdown ── -->
+        <activity
+            android:name=".AppOpenDelayActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+
 
     </application>
 
