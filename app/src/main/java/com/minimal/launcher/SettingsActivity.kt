@@ -132,6 +132,10 @@ class SettingsActivity : AppCompatActivity() {
         setSelected(binding.optWeightLight,   prefs.clockWeight == "light")
         setSelected(binding.optWeightRegular, prefs.clockWeight == "regular")
 
+        // Home apps mode
+        setSelected(binding.optHomePinned,   prefs.homeTab == "pinned")
+        setSelected(binding.optHomeFrequent, prefs.homeTab == "frequent")
+
         // Display mode
         setSelected(binding.optList, prefs.displayMode == "list")
         setSelected(binding.optGrid, prefs.displayMode == "grid")
@@ -279,6 +283,10 @@ class SettingsActivity : AppCompatActivity() {
         binding.optWeightThin.setOnClickListener    { prefs.clockWeight = "thin";    applyAll() }
         binding.optWeightLight.setOnClickListener   { prefs.clockWeight = "light";   applyAll() }
         binding.optWeightRegular.setOnClickListener { prefs.clockWeight = "regular"; applyAll() }
+
+        // Home apps mode
+        binding.optHomePinned.setOnClickListener   { prefs.homeTab = "pinned";   applyAll() }
+        binding.optHomeFrequent.setOnClickListener { prefs.homeTab = "frequent"; applyAll() }
 
         // Display mode
         binding.optList.setOnClickListener { prefs.displayMode = "list"; applyAll() }

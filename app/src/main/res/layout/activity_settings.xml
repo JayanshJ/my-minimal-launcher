@@ -147,6 +147,16 @@
         <!-- ══ APPS ══ -->
         <TextView style="@style/SectionHeader" android:layout_marginTop="28dp" android:text="apps" />
 
+        <!-- home apps mode -->
+        <LinearLayout style="@style/SettingRow">
+            <TextView style="@style/RowLabel" android:text="home apps" />
+            <LinearLayout style="@style/RowOptions">
+                <TextView android:id="@+id/opt_home_pinned"   style="@style/Opt" android:text="pinned" />
+                <TextView style="@style/Dot" />
+                <TextView android:id="@+id/opt_home_frequent" style="@style/Opt" android:text="frequent" />
+            </LinearLayout>
+        </LinearLayout>
+
         <!-- app list style -->
         <LinearLayout style="@style/SettingRow">
             <TextView style="@style/RowLabel" android:text="drawer layout" />
