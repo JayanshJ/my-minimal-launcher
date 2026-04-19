@@ -67,8 +67,10 @@ class AppListAdapter(
         diff.dispatchUpdatesTo(this)
     }
 
-    fun getSpanSize(position: Int): Int =
-        if (items.getOrNull(position) is Item.Header) 2 else 1
+    fun getSpanSize(position: Int): Int = when (items.getOrNull(position)) {
+        is Item.Header, is Item.SettingsResult, is Item.Contact -> 2
+        else -> 1
+    }
 
     // ── ViewHolders ───────────────────────────────────────────────────────────
 
